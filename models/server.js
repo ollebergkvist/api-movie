@@ -9,7 +9,7 @@ function createServer() {
 	const app = express(); // Binds express to app
 	app.use(helmet()); // Helmet for secure headers
 	app.use(compression()); // Enables gzip compression
-	app.use(morgan('combined'));
+	app.use(morgan('combined')); // Enables http request logging
 	app.use(express.json()); // Parse JSON bodies
 	app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 	app.use(cors()); // Cross-origin resource sharing
