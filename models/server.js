@@ -1,6 +1,6 @@
 const express = require('express');
-const routes = require('../routes/movie.js');
-const routes2 = require('../routes/user.js');
+const movieRoutes = require('../routes/movie.js');
+const userRoutes = require('../routes/user.js');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
@@ -15,17 +15,16 @@ function createServer() {
 	app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 	app.use(cors()); // Cross-origin resource sharing
 	app.use('/uploads', express.static('./uploads')); // Make uploads folder static file so it can be accessed
-	app.use('/api', routes); // Enables routes
-	app.use('/api', routes2); // Enables routes
+	app.use('/api', movieRoutes); // Enables movie routes
+	app.use('/api', userRoutes); // Enables user routes
 	// Enables static index site
 	app.route('/').get(function (req, res) {
 		res.sendFile(process.cwd() + '/index.html');
 	});
 	// Capture All 404 errors
-	app.use(function (req, res, next) {
+	app.use(function (req, res) {
 		res.status(404).json({
 			errors: {
-				status: 404,
 				source: req.path,
 				title: 'Not found',
 				detail: 'Could not find path: ' + req.path,

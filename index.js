@@ -1,6 +1,6 @@
 const path = require('path');
 
-// Load different .env variables depending on production / development / docker
+// Load different .env variables depending on production / development / docker builds
 if (process.env.NODE_ENV === 'docker') {
 	require('dotenv').config({ path: path.resolve(__dirname, './.env.docker') });
 } else {

@@ -9,20 +9,36 @@ const updateUserRights = async (req, res) => {
 			{ admin: req.body.admin },
 			{ new: true }
 		);
-		res.status(200).json(user);
+
+		if (!user) {
+			res.send(409).json({
+				type: 'Error',
+				source: req.path,
+				detail: 'User with given id could not be found',
+			});
+		}
+
+		res.status(200).json({
+			type: 'Success',
+			source: req.path,
+			detail: 'User rights updated successfully',
+		});
 	} catch (err) {
 		return res.status(404).send({
+			type: 'Error',
+			source: req.path,
+			title: 'Database error',
 			message: err.message,
 		});
 	}
 };
 
 const getUsers = (req, res) => {
-	Movie.find().then((documents) => {
-		return res.json({
-			status: 200,
+	Movie.find().then((users) => {
+		return res.status(200).json({
+			type: 'Success',
 			message: 'Users retrieved successfully',
-			Userdata: documents,
+			documents: users,
 		});
 	});
 };
@@ -30,10 +46,27 @@ const getUsers = (req, res) => {
 const getUser = async (req, res) => {
 	try {
 		const user = await User.findById(req.params.id);
-		res.status(200).json(user);
+
+		if (!user) {
+			res.send(409).json({
+				type: 'Error',
+				source: req.path,
+				detail: 'User with given id could not be found',
+			});
+		}
+
+		res.status(200).json({
+			type: 'Success',
+			source: req.path,
+			detail: 'User found',
+			document: user,
+		});
 	} catch (err) {
 		return res.status(404).send({
-			message: err.message,
+			type: 'Error',
+			source: req.path,
+			title: 'Database error',
+			detail: err.message,
 		});
 	}
 };
@@ -47,8 +80,10 @@ const register = async (req, res) => {
 	} catch (err) {
 		return res.status(500).json({
 			errors: {
+				type: 'Error',
 				source: req.path,
-				message: 'Bcrypt error',
+				title: 'Bcrypt error',
+				detail: 'Bcrypt was unable to hash password',
 			},
 		});
 	}
@@ -60,19 +95,31 @@ const register = async (req, res) => {
 			password: hashedPassword,
 		});
 
-		// Checks if email address is registered
+		// Checks if email address is registered already
 		const user = await userSchema.findOne({ email: req.body.email });
 		if (user) {
-			res
-				.status(500)
-				.send({ message: 'An account with this email already exists' });
+			res.status(409).send({
+				type: 'Error',
+				source: req.path,
+				title: 'Registration error',
+				detail: 'An account with this email already exists',
+			});
 		} else {
 			// Saves new user
 			await newUser.save();
-			res.status(201).send({ message: 'Registration succeeded' });
+			res.status(201).send({
+				type: 'Success',
+				source: req.path,
+				detail: 'Registration succeeded',
+			});
 		}
 	} catch (err) {
-		res.status(500).send({ message: 'Registration failed' });
+		res.status(500).send({
+			type: 'Error',
+			source: req.path,
+			title: 'Database error',
+			message: err.message,
+		});
 	}
 };
 
@@ -84,7 +131,7 @@ const login = async (req, res) => {
 
 		// Error handling if a user with given email was not found
 		if (!user) {
-			res.status(401).send({
+			res.status(409).send({
 				type: 'Error',
 				source: req.path,
 				title: 'Authorization error',
@@ -107,7 +154,7 @@ const login = async (req, res) => {
 						type: 'Error',
 						source: req.path,
 						title: 'Authorization error',
-						detail: 'Password not matched',
+						detail: 'Wrong password',
 					});
 				}
 
@@ -120,7 +167,7 @@ const login = async (req, res) => {
 				return res.status(200).json({
 					type: 'Success',
 					source: req.path,
-					detail: 'Password matched',
+					detail: 'User logged in',
 					user: user.email,
 					admin: user.admin,
 					token: token,
@@ -140,11 +187,29 @@ const login = async (req, res) => {
 const addFavoriteMovie = async (req, res) => {
 	try {
 		const user = await User.findById(req.params.id);
+
+		if (!user) {
+			res.send(409).json({
+				type: 'Error',
+				source: req.path,
+				detail: 'User with given id could not be found',
+			});
+		}
+
 		user.favorites.push({ movieID: 5 });
 		user.save();
-		return res.status(200).json(user);
+		return res.status(200).json({
+			type: 'Success',
+			source: req.path,
+			detail: 'Movie added to user favorites',
+		});
 	} catch (err) {
-		console.log(err);
+		console.log({
+			type: 'Error',
+			source: req.path,
+			title: 'Database error',
+			detail: err.message,
+		});
 	}
 };
 
