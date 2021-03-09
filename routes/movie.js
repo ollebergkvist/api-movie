@@ -27,8 +27,8 @@ router.post(
 // Create movie
 router.post(
 	'/movies',
-	// admin,
-	// auth,
+	auth,
+	admin,
 	uploadImage,
 	validator.body(schemas.create),
 	movieController.createMovie
@@ -37,8 +37,8 @@ router.post(
 // Update movie
 router.put(
 	'/movies/:id',
-	admin,
 	auth,
+	admin,
 	validator.query(schemas.put),
 	movieController.updateMovie
 );
@@ -46,20 +46,20 @@ router.put(
 // Delete movie (Hard delete)
 router.delete(
 	'/movies/:id',
-	admin,
 	auth,
+	admin,
 	validator.params(schemas.id),
 	movieController.deleteMovie
 );
 
 // Remove movie (Soft delete)
-router.post('/return/:id', admin, auth, movieController.removeMovie);
+router.post('/return/:id', auth, admin, movieController.removeMovie);
 
 // Change availability of movie by id
 router.put(
 	'/movies/availability/:id',
-	admin,
 	auth,
+	admin,
 	validator.params(schemas.id),
 	movieController.availability
 );
@@ -67,7 +67,7 @@ router.put(
 // Rent movie
 router.post(
 	'/movies/rent',
-	// auth,
+	auth,
 	validator.body(schemas.rent),
 	movieController.rentMovie
 );
@@ -75,7 +75,7 @@ router.post(
 // Purchase movie
 router.post(
 	'/movies/purchase',
-	// auth,
+	auth,
 	validator.body(schemas.purchase),
 	movieController.purchaseMovie
 );
@@ -83,7 +83,8 @@ router.post(
 // Return movie
 router.post(
 	'/movies/return/:id',
-	// auth,
+	auth,
+	admin,
 	validator.body(schemas.id),
 	movieController.returnMovie
 );

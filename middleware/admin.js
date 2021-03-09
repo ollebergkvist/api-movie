@@ -1,7 +1,11 @@
 module.exports = function (req, res, next) {
-	if (req.body.admin === false) {
-		console.log('false');
-		res.status(401).send('Unauthorized');
+	if (req.user.admin !== true) {
+		res.status(401).send({
+			type: 'Error',
+			source: req.url,
+			title: 'Authorization error',
+			detail: 'User lacks admin rights',
+		});
 	} else {
 		next();
 	}

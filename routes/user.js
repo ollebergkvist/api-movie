@@ -5,19 +5,19 @@ const auth = require('../middleware/auth.js'); // Middleware to authenticate wit
 const admin = require('../middleware/admin.js'); // Middleware to verify admin rights
 
 // Update user permissions
-router.put('/user/:id', admin, auth, userController.updateUserRights);
+router.put('/user/:id', auth, admin, userController.updateUserRights);
 
 // Get all users
-router.get('/users', admin, auth, userController.getUsers);
+router.get('/users', auth, admin, userController.getUsers);
 
 // Get user by id
-router.post('/user/:id', admin, auth, userController.getUser);
+router.post('/user/:id', auth, admin, userController.getUser);
 
 // Register user
 router.post('/register', userController.register);
 
 // Login
-router.post('/login', auth, userController.login);
+router.post('/login', userController.login);
 
 // Like movie
 router.put('/favorite/:id', auth, userController.addFavoriteMovie);

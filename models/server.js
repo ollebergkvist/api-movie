@@ -1,5 +1,6 @@
 const express = require('express');
 const routes = require('../routes/movie.js');
+const routes2 = require('../routes/user.js');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
@@ -15,6 +16,7 @@ function createServer() {
 	app.use(cors()); // Cross-origin resource sharing
 	app.use('/uploads', express.static('./uploads')); // Make uploads folder static file so it can be accessed
 	app.use('/api', routes); // Enables routes
+	app.use('/api', routes2); // Enables routes
 	// Enables static index site
 	app.route('/').get(function (req, res) {
 		res.sendFile(process.cwd() + '/index.html');
