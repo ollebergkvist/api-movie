@@ -1,7 +1,7 @@
-const Movie = require('../schemas/movie.js');
-const Rent = require('../schemas/rent.js');
-const Purchase = require('../schemas/purchase.js');
-const aqp = require('api-query-params');
+const Movie = require('../schemas/movie.js'); // Movie mongoose schema
+const Rent = require('../schemas/rent.js'); // Rent mongoose schema
+const Purchase = require('../schemas/purchase.js'); // Purchase mongoose schema
+const aqp = require('api-query-params'); // Module to convert query params to mongodb query object
 
 // Sort recent record
 // sort({ _id: -1 }
@@ -89,10 +89,27 @@ const getMovies = async (req, res, next) => {
 const getMovie = async (req, res) => {
 	try {
 		const movie = await Movie.findById(req.params.id);
-		return res.status(200).json(movie);
+
+		if (!movie) {
+			res.send(409).json({
+				type: 'Error',
+				source: req.path,
+				detail: 'Movie with given id could not be found',
+			});
+		}
+
+		return res.status(200).json({
+			type: 'Success',
+			source: req.path,
+			detail: 'Movie fetched',
+			document: movie,
+		});
 	} catch (err) {
 		return res.status(404).send({
-			message: 'Movie with given ID could not be found',
+			type: 'Error',
+			source: req.path,
+			title: 'Database error',
+			message: err.message,
 		});
 	}
 };
@@ -107,9 +124,17 @@ const searchMovies = async (req, res) => {
 		const movie = await Movie.find({
 			title: { $regex: req.query.title, $options: 'i' },
 		});
-		res.status(200).json(movie);
+		res.status(200).json({
+			type: 'Success',
+			source: req.path,
+			detail: 'Movie fetched',
+			document: movie,
+		});
 	} catch (err) {
 		return res.status(404).send({
+			type: 'Error',
+			source: req.path,
+			title: 'Database error',
 			message: err.message,
 		});
 	}
@@ -130,11 +155,16 @@ const createMovie = async (req, res) => {
 	try {
 		movie.save();
 		return res.status(201).json({
+			type: 'Success',
+			source: req.path,
 			message: 'Movie successfully created',
 			document: movie,
 		});
 	} catch (err) {
 		return res.status(404).send({
+			type: 'Error',
+			source: req.path,
+			title: 'Database error',
 			message: err.message,
 		});
 	}
@@ -160,11 +190,15 @@ const deleteMovie = async (req, res, next) => {
 	try {
 		const movie = await Movie.deleteOne({ _id: req.params.id });
 		return res.status(204).json({
-			message: 'Movie deleted Successfully',
-			document: movie,
+			type: 'Success',
+			source: req.path,
+			message: 'Movie deleted successfully',
 		});
 	} catch (err) {
 		return res.status(404).send({
+			type: 'Error',
+			source: req.path,
+			title: 'Database error',
 			message: err.message,
 		});
 	}
@@ -175,11 +209,16 @@ const removeMovie = async (req, res) => {
 	try {
 		const movie = await Movie.findById(req.params.id);
 		movie.delete();
-		res
-			.status(204)
-			.json({ message: 'Movie successfully deleted', document: movie });
+		res.status(204).json({
+			type: 'Success',
+			source: req.path,
+			message: 'Movie successfully removed',
+		});
 	} catch (err) {
 		return res.status(404).send({
+			type: 'Error',
+			source: req.path,
+			title: 'Database error',
 			message: err.message,
 		});
 	}
@@ -193,9 +232,16 @@ const availability = async (req, res) => {
 			{ availability: true },
 			{ new: true }
 		);
-		res.status(200).json(movie);
+		res.status(200).json({
+			type: 'Success',
+			source: req.path,
+			message: 'Movie availability successfully updated',
+		});
 	} catch (err) {
 		return res.status(404).send({
+			type: 'Error',
+			source: req.path,
+			title: 'Database error',
 			message: err.message,
 		});
 	}
@@ -225,18 +271,25 @@ const rentMovie = async (req, res) => {
 			});
 
 			return res.status(200).json({
+				type: 'Success',
+				source: req.path,
 				message: 'Movie successfully rented',
 				document: rent,
 			});
 		} catch (err) {
 			return res.status(404).send({
+				type: 'Error',
+				source: req.path,
+				title: 'Database error',
 				message: err.message,
 			});
 		}
 	} else {
-		return res
-			.status(200)
-			.json({ message: 'Insufficient stock to complete order' });
+		return res.status(200).json({
+			type: 'Error',
+			source: req.path,
+			message: 'Insufficient stock to complete order',
+		});
 	}
 };
 
@@ -262,18 +315,25 @@ const purchaseMovie = async (req, res) => {
 			});
 
 			return res.status(201).json({
+				type: 'Success',
+				source: req.path,
 				message: 'Movie successfully purchased',
 				document: purchase,
 			});
 		} catch (err) {
 			return res.status(404).send({
+				type: 'Error',
+				source: req.path,
+				title: 'Database error',
 				message: err.message,
 			});
 		}
 	} else {
-		return res
-			.status(200)
-			.json({ message: 'Insufficient stock to complete order' });
+		return res.status(200).json({
+			type: 'Error',
+			source: req.path,
+			message: 'Insufficient stock to complete order',
+		});
 	}
 };
 
@@ -283,7 +343,9 @@ const returnMovie = async (req, res) => {
 		var rent = await Rent.findById(req.body.id);
 	} catch (err) {
 		return res.status(404).send({
-			message: 'Rental order with given ID could not be found',
+			type: 'Error',
+			source: req.path,
+			message: 'Order with given id could not be found',
 		});
 	} finally {
 		const currentTime = Date.now();
@@ -307,8 +369,9 @@ const returnMovie = async (req, res) => {
 		}
 
 		return res.status(200).json({
+			type: 'Success',
+			source: req.path,
 			message: 'Movie successfully returned',
-			document: rent,
 		});
 	}
 };
