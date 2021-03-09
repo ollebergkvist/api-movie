@@ -39,7 +39,8 @@ router.put(
 	'/movies/:id',
 	auth,
 	admin,
-	validator.query(schemas.put),
+	validator.params(schemas.id),
+	validator.body(schemas.put),
 	movieController.updateMovie
 );
 
@@ -53,7 +54,13 @@ router.delete(
 );
 
 // Remove movie (Soft delete)
-router.post('/return/:id', auth, admin, movieController.removeMovie);
+router.post(
+	'/return/:id',
+	auth,
+	admin,
+	validator.params(schemas.id),
+	movieController.removeMovie
+);
 
 // Change availability of movie by id
 router.put(
@@ -85,7 +92,7 @@ router.post(
 	'/movies/return/:id',
 	auth,
 	admin,
-	validator.body(schemas.id),
+	validator.params(schemas.id),
 	movieController.returnMovie
 );
 

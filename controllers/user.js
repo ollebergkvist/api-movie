@@ -196,7 +196,7 @@ const addFavoriteMovie = async (req, res) => {
 			});
 		}
 
-		user.favorites.push({ movieID: 5 });
+		user.favorites.push({ movieID: req.body.movie_id });
 		user.save();
 		return res.status(200).json({
 			type: 'Success',

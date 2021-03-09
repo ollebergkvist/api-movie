@@ -14,36 +14,49 @@ const complexityOptions = {
 
 const schemas = {
 	id: Joi.object({
-		id: Joi.string().min(1).required(),
+		id: Joi.string().required(),
+	}),
+	favorite: Joi.object({
+		movie_id: Joi.string().required(),
 	}),
 	create: Joi.object({
-		admin: Joi.boolean().required(),
-		title: Joi.string().min(1).required(),
-		description: Joi.string().min(1).required(),
-		stock: Joi.number().min(1).required(),
-		rental_price: Joi.number().min(1).required(),
-		sales_price: Joi.number().min(1).required(),
+		title: Joi.string().required(),
+		description: Joi.string().required(),
+		stock: Joi.number().required(),
+		rental_price: Joi.number().required(),
+		sales_price: Joi.number().required(),
 		availability: Joi.boolean().required(),
 	}),
+	put: Joi.object({
+		title: Joi.string(),
+		description: Joi.string(),
+		stock: Joi.number(),
+		rental_price: Joi.number(),
+		sales_price: Joi.number(),
+		availability: Joi.boolean(),
+	}).min(1),
 	search: Joi.object({
-		title: Joi.string().min(1).required(),
+		title: Joi.string().required(),
 	}),
 	rent: Joi.object({
-		movie_id: Joi.string().min(1).required(),
-		customer_id: Joi.string().min(1).required(),
-		amount: Joi.number().min(1).required(),
-		cost: Joi.number().min(1).required(),
+		movie_id: Joi.string().required(),
+		customer_id: Joi.string().required(),
+		amount: Joi.number().required(),
+		cost: Joi.number().required(),
 	}),
 	purchase: Joi.object({
-		movie_id: Joi.string().min(1).required(),
-		customer_id: Joi.string().min(1).required(),
-		amount: Joi.number().min(1).required(),
-		cost: Joi.number().min(1).required(),
+		movie_id: Joi.string().required(),
+		customer_id: Joi.string().required(),
+		amount: Joi.number().required(),
+		cost: Joi.number().required(),
 	}),
 	register: Joi.object({
 		email: Joi.string().email(),
 		password: passwordComplexity(complexityOptions),
-		// password: .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
+	}),
+	login: Joi.object({
+		email: Joi.string().email().required(),
+		password: Joi.string().required(),
 	}),
 };
 module.exports = schemas;
