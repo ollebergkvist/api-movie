@@ -54,9 +54,19 @@ const getMovies = async (req, res, next) => {
 
 	try {
 		const movies = await Movie.paginate(filter);
-		res.status(200).json(movies);
+		res.status(200).json({
+			type: 'Success',
+			source: req.path,
+			detail: 'Movies fetched',
+			document: movies,
+		});
 	} catch (err) {
-		res.status(404).json(err);
+		res.status(404).json({
+			type: 'Error',
+			source: req.path,
+			title: 'Database error',
+			message: err.message,
+		});
 	}
 
 	// if (req.body.admin === 'admin' && req.query.sort) {
@@ -95,6 +105,7 @@ const getMovie = async (req, res) => {
 				type: 'Error',
 				source: req.path,
 				detail: 'Movie with given id could not be found',
+				document: movies,
 			});
 		}
 
