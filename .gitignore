@@ -3,3 +3,4 @@
 /uploads
 /.env.docker
 /.dockerignore
+/.env.production
