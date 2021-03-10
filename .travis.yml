@@ -11,6 +11,9 @@ services:
 
 sudo: false
 
+env:
+  - NODE_ENV=test
+
 git:
   submodules: false
 
