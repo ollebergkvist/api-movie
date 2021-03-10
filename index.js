@@ -10,7 +10,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const createServer = require('./models/server.js');
 const port = process.env.PORT;
-const uri = process.env.MONGDODB_URI;
+const uri = process.env.MONGDODB_URI || 'mongodb://localhost:27017/movies';
 
 const connection = mongoose
 	.connect(uri, {
