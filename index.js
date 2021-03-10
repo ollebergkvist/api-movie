@@ -1,16 +1,16 @@
-// const path = require('path');
-
-// Load different .env variables depending on production / development / docker builds
-// if (process.env.NODE_ENV !== 'production') {
-
-// }
-
 require('dotenv').config();
-
 const mongoose = require('mongoose');
 const createServer = require('./models/server.js');
-const port = process.env.PORT;
-const uri = process.env.MONGDODB_URI || 'mongodb://localhost:27017/movies';
+var port;
+var uri;
+
+if (process.env.NODE_ENV === 'test') {
+	uri = 'mongodb://localhost:27017/movies';
+	port = 3000;
+} else {
+	uri = process.env.MONGDODB_URI;
+	port = process.env.PORT;
+}
 
 const connection = mongoose
 	.connect(uri, {

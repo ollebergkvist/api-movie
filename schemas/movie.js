@@ -8,7 +8,7 @@ const movieSchema = new schema(
 		title: { type: String, unique: true, required: true },
 		description: { type: String, required: true },
 		image: { type: String, required: true },
-		stock: { type: Number, required: true, minimum: 0, default: 1 },
+		stock: { type: Number, required: true, minimum: 0, default: 5 },
 		rental_price: { type: Number, required: true, default: 10 },
 		sales_price: { type: Number, required: true, default: 20 },
 		availability: { type: Boolean, required: true, default: true },

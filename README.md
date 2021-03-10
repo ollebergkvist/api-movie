@@ -39,11 +39,11 @@ mongorestore --gzip --archive=movies.archive
 
 ```
 User
-username: user
+username: user@user.com
 password: Password#1
 
 Admin
-username: admin
+username: admin@admin.com
 password: Password#1
 ```
 
