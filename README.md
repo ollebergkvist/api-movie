@@ -30,7 +30,7 @@ Restore
 mongorestore --gzip --archive=movies.archive
 ```
 
-# Users
+# Precreated users
 
 ```
 User
@@ -56,7 +56,6 @@ https://www.getpostman.com/collections/e053a56d92616fc3bab9
 
 ```
 Routes open to the public:
-
 GET /movies
 GET /movies/:id
 GET /search
@@ -64,24 +63,27 @@ GET /search
 
 ```
 Routes secured by JWT:
-
 POST /movies/rent
 POST /movies/purchase
+PUT /favorite/:id
 
-The following routes need a valid JSON Web Token (JWT) set in the HTTP-header.
+The mentioned routes need a valid JSON Web Token (JWT) set in the HTTP-header.
 The 'x-access-token' header should contain the JWT. In order to retrieve a token, a user
-need to register and login successfully.
+need to register and login successfully via the routes stated below:
+POST /register
+POST /login
 ```
 
 ```
 Routes secured with JWT plus admin rights:
-
 POST /api/movies
 PUT /api/movies/:id
 DELETE /movies/:id
 POST /remove/:id
 PUT /movies/availability/:id
 POST /movies/return/:id
+GET /users
+PUT /user/:id
 
 ```
 
