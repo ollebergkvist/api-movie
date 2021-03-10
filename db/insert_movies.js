@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 mongoose.connect(
 	'mongodb+srv://ollebergkvist:76yCT7fyEA8TNcJB@cluster0.bhxhf.mongodb.net/movies?retryWrites=true&w=majority'
 );
+
 const Movie = require('../schemas/movie.js');
 
 // Movie documents
