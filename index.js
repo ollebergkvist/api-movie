@@ -1,9 +1,11 @@
-const path = require('path');
+// const path = require('path');
 
 // Load different .env variables depending on production / development / docker builds
-if (process.env.NODE_ENV !== 'production') {
-	require('dotenv').config();
-}
+// if (process.env.NODE_ENV !== 'production') {
+
+// }
+
+require('dotenv').config();
 
 const mongoose = require('mongoose');
 const createServer = require('./models/server.js');

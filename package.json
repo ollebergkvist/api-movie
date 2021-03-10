@@ -14,7 +14,7 @@
     ]
   },
   "scripts": {
-    "start": "node index.js",
+    "start": "node index.js -require dotenv/config",
     "dev": "NODE_ENV=dev node index.js",
     "test": "jest"
   },
