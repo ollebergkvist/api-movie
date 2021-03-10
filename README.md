@@ -1,15 +1,18 @@
 # Install
 
 ```
-git clone https://github.com/ollebergkvist/api-movie
-npm install
-touch .env
+Clone repo: git clone https://github.com/ollebergkvist/api-movie
+
+Install dependencies: npm install
+
+Create .env file: touch .env
+
 ```
 
 # Environment variables
 
 ```
-## Set the env variables in the .env file
+Set the required env variables in the .env file
 
 SECRET={jwtSecret}
 MONGDODB_URI={URI}
@@ -25,6 +28,16 @@ mongodump --db movies --archive=movies.archive --gzip
 
 Restore
 mongorestore --gzip --archive=movies.archive
+```
+
+# Postman collection
+
+```
+Development (Localhost):
+https://www.getpostman.com/collections/7a71e416d915d809cea9
+
+Deployed (Heroku):
+https://www.getpostman.com/collections/e053a56d92616fc3bab9
 ```
 
 # Movie API documentation
@@ -468,3 +481,34 @@ password
 ```
 
 N.B. The access token expires after 24 hours.
+
+## Rentals
+
+### A rental has the following attributes:
+
+```
+movie_id
+customer_id
+amount
+cost
+return_date
+returned
+rental_price
+penalty
+returnedAt
+createdAt
+updatedAt
+```
+
+## Purchases
+
+### A purchase has the following attributes:
+
+```
+movie_id
+customer_id
+amount
+cost
+createdAt
+updatedAt
+```
