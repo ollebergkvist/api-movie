@@ -1,17 +1,19 @@
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/movies');
+mongoose.connect(
+	'mongodb+srv://ollebergkvist:76yCT7fyEA8TNcJB@cluster0.bhxhf.mongodb.net/movies?retryWrites=true&w=majority'
+);
 const newUser = require('../schemas/user.js');
 
 // User documents
 const user1 = new newUser({
 	email: 'admin@admin.com',
-	password: 'admin',
+	password: 'Password#1',
 	admin: true,
 });
 
 const user2 = new newUser({
 	email: 'user@user.com',
-	password: 'user',
+	password: 'Password#1',
 });
 
 // Users array

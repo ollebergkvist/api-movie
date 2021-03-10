@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/movies');
+mongoose.connect(
+	'mongodb+srv://ollebergkvist:76yCT7fyEA8TNcJB@cluster0.bhxhf.mongodb.net/movies?retryWrites=true&w=majority'
+);
 const Movie = require('../schemas/movie.js');
 
 // Movie documents
@@ -9,6 +11,7 @@ const movie1 = new Movie({
 		'Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.',
 	image:
 		'https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_UX182_CR0,0,182,268_AL_.jpg',
+	stock: 10,
 });
 
 const movie2 = new Movie({
@@ -17,6 +20,7 @@ const movie2 = new Movie({
 		"An organized crime dynasty's aging patriarch transfers control of his clandestine empire to his reluctant son.",
 	image:
 		'https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_UY268_CR3,0,182,268_AL_.jpg',
+	likes: 5,
 });
 
 const movie3 = new Movie({
@@ -25,6 +29,7 @@ const movie3 = new Movie({
 		'The early life and career of Vito Corleone in 1920s New York City is portrayed, while his son, Michael, expands and tightens his grip on the family crime syndicate.',
 	image:
 		'https://m.media-amazon.com/images/M/MV5BMWMwMGQzZTItY2JlNC00OWZiLWIyMDctNDk2ZDQ2YjRjMWQ0XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_UY268_CR3,0,182,268_AL_.jpg',
+	availability: false,
 });
 
 const movie4 = new Movie({
