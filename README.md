@@ -30,6 +30,18 @@ Restore
 mongorestore --gzip --archive=movies.archive
 ```
 
+# Users
+
+```
+User
+username: user
+password: Password#1
+
+Admin
+username: admin
+password: Password#1
+```
+
 # Postman collection
 
 ```
@@ -42,8 +54,38 @@ https://www.getpostman.com/collections/e053a56d92616fc3bab9
 
 # Movie API documentation
 
-To use the following routes, you need a valid JSON Web Token (JWT) set in the HTTP-header.
-The 'x-access-token' header should contain the JWT.
+```
+Routes open to the public:
+
+GET /movies
+GET /movies/:id
+GET /search
+```
+
+```
+Routes secured by JWT:
+
+POST /movies/rent
+POST /movies/purchase
+
+The following routes need a valid JSON Web Token (JWT) set in the HTTP-header.
+The 'x-access-token' header should contain the JWT. In order to retrieve a token, a user
+need to register and login successfully.
+```
+
+```
+Routes secured with JWT plus admin rights:
+
+POST /api/movies
+PUT /api/movies/:id
+DELETE /movies/:id
+POST /remove/:id
+PUT /movies/availability/:id
+POST /movies/return/:id
+
+```
+
+All other routes are open to the general public.
 
 ## Movies
 
@@ -482,7 +524,7 @@ password
 
 N.B. The access token expires after 24 hours.
 
-## Rentals
+# Rentals
 
 ### A rental has the following attributes:
 
@@ -500,7 +542,7 @@ createdAt
 updatedAt
 ```
 
-## Purchases
+# Purchases
 
 ### A purchase has the following attributes:
 

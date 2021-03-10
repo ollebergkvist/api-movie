@@ -18,8 +18,8 @@ router.get(
 );
 
 // Search
-router.post(
-	'/movies/search',
+router.get(
+	'/search',
 	validator.query(schemas.search),
 	movieController.searchMovies
 );
@@ -55,7 +55,7 @@ router.delete(
 
 // Remove movie (Soft delete)
 router.post(
-	'/return/:id',
+	'/remove/:id',
 	auth,
 	admin,
 	validator.params(schemas.id),
