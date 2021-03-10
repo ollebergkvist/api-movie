@@ -6,7 +6,8 @@ cache:
   directories:
     - 'node_modules'
 
-services: mongodb
+services:
+  - mongodb
 
 sudo: false
 
