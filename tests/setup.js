@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 beforeEach((done) => {
 	mongoose.connect(
-		`mongodb://localhost:27017/${process.env.TEST_SUITE}`,
+		`mongodb://localhost:27017/movies`,
 		{ useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true },
 		() => done()
 	);
