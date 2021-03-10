@@ -1,6 +1,4 @@
 /node_modules
 /.env
 /uploads
-/.env.docker
 /.dockerignore
-/.env.production
