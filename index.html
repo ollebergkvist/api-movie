@@ -1,1 +1,441 @@
-<h1>Welcome to MOVIE-API</h1>
+<h1>MOVIE-API</h1>
+<hr>
+<h1>Install</h1>
+<pre class="code-block"><code class="language-">Clone repo: git clone https://github.com/ollebergkvist/api-movie
+
+Install dependencies: npm install
+
+Create .env file: touch .env
+
+</code></pre>
+<h1>Environment variables</h1>
+<pre class="code-block"><code class="language-">Set the required env variables in the .env file
+
+SECRET={jwtSecret}
+MONGDODB_URI={URI}
+PORT={PORT}
+
+</code></pre>
+<h1>Database</h1>
+<pre class="code-block"><code class="language-">Backup
+mongodump --db movies --archive=movies.archive --gzip
+
+Restore
+mongorestore --gzip --archive=movies.archive
+</code></pre>
+<h1>Precreated users</h1>
+<pre class="code-block"><code class="language-">User
+username: user@user.com
+password: Password#1
+
+Admin
+username: admin@admin.com
+password: Password#1
+</code></pre>
+<h1>Postman collection</h1>
+<pre class="code-block"><code class="language-">Development (Localhost):
+https://www.getpostman.com/collections/7a71e416d915d809cea9
+
+Deployed (Heroku):
+https://www.getpostman.com/collections/e053a56d92616fc3bab9
+</code></pre>
+<h1>Movie API documentation</h1>
+<pre class="code-block"><code class="language-">Routes open to the public:
+GET /movies
+GET /movies/:id
+GET /search
+</code></pre>
+<pre class="code-block"><code class="language-">Routes secured by JWT:
+POST /movies/rent
+POST /movies/purchase
+PUT /favorite/:id
+
+The mentioned routes need a valid JSON Web Token (JWT) set in the HTTP-header.
+The 'x-access-token' header should contain the JWT. In order to retrieve a token, a user
+need to register and login successfully via the routes stated below:
+POST /register
+POST /login
+</code></pre>
+<pre class="code-block"><code class="language-">Routes secured with JWT plus admin rights:
+POST /api/movies
+PUT /api/movies/:id
+DELETE /movies/:id
+POST /remove/:id
+PUT /movies/availability/:id
+POST /movies/return/:id
+GET /users
+PUT /user/:id
+
+</code></pre>
+<p>All other routes are open to the general public.</p>
+<h2 id="movies">Movies</h2>
+<h3 id="a-movie-has-the-following-attributes%3A">A movie has the following attributes:</h3>
+<pre class="code-block"><code class="language-">id
+title
+description
+image
+stock
+deleted
+rental_price
+sales_price
+availability
+likes
+createdAt
+updatedAt
+</code></pre>
+<h1>Get all movies:</h1>
+<h3 id="resource-url">Resource URL</h3>
+<pre class="code-block"><code class="language-">GET /api/movies
+</code></pre>
+<h3 id="result%3A">Result:</h3>
+<pre class="code-block"><code class="language-">{
+    &quot;status&quot;: 200,
+    &quot;message&quot;: &quot;Movies retrieved successfully&quot;,
+    &quot;document&quot;: [
+        {
+            &quot;stock&quot;: 0,
+            &quot;rental_price&quot;: 10,
+            &quot;sales_price&quot;: 20,
+            &quot;availability&quot;: true,
+            &quot;deleted&quot;: false,
+            &quot;_id&quot;: &quot;604148784c13630128ad18e6&quot;,
+            &quot;title&quot;: &quot;The Shawshank Redemption&quot;,
+            &quot;description&quot;: &quot;Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.&quot;,
+            &quot;image&quot;: &quot;https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_UX182_CR0,0,182,268_AL_.jpg&quot;,
+            &quot;__v&quot;: 0,
+            &quot;createdAt&quot;: &quot;2021-03-04T20:52:08.415Z&quot;,
+            &quot;updatedAt&quot;: &quot;2021-03-04T20:52:08.415Z&quot;
+        },
+        {
+            &quot;stock&quot;: 0,
+            &quot;rental_price&quot;: 10,
+            &quot;sales_price&quot;: 20,
+            &quot;availability&quot;: true,
+            &quot;deleted&quot;: false,
+            &quot;_id&quot;: &quot;604148784c13630128ad18e7&quot;,
+            &quot;title&quot;: &quot;The Godfather&quot;,
+            &quot;description&quot;: &quot;An organized crime dynasty's aging patriarch transfers control of his clandestine empire to his reluctant son.&quot;,
+            &quot;image&quot;: &quot;https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_UY268_CR3,0,182,268_AL_.jpg&quot;,
+            &quot;__v&quot;: 0,
+            &quot;createdAt&quot;: &quot;2021-03-04T20:52:08.417Z&quot;,
+            &quot;updatedAt&quot;: &quot;2021-03-04T20:52:08.417Z&quot;
+        },
+        {
+            &quot;stock&quot;: 0,
+            &quot;rental_price&quot;: 10,
+            &quot;sales_price&quot;: 20,
+            &quot;availability&quot;: true,
+            &quot;deleted&quot;: false,
+            &quot;_id&quot;: &quot;604148784c13630128ad18e8&quot;,
+            &quot;title&quot;: &quot;The Godfather: Part II&quot;,
+            &quot;description&quot;: &quot;The early life and career of Vito Corleone in 1920s New York City is portrayed, while his son, Michael, expands and tightens his grip on the family crime syndicate.&quot;,
+            &quot;image&quot;: &quot;https://m.media-amazon.com/images/M/MV5BMWMwMGQzZTItY2JlNC00OWZiLWIyMDctNDk2ZDQ2YjRjMWQ0XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_UY268_CR3,0,182,268_AL_.jpg&quot;,
+            &quot;__v&quot;: 0,
+            &quot;createdAt&quot;: &quot;2021-03-04T20:52:08.417Z&quot;,
+            &quot;updatedAt&quot;: &quot;2021-03-04T20:52:08.417Z&quot;
+        },
+        {
+            &quot;stock&quot;: 0,
+            &quot;rental_price&quot;: 10,
+            &quot;sales_price&quot;: 20,
+            &quot;availability&quot;: true,
+            &quot;deleted&quot;: false,
+            &quot;_id&quot;: &quot;604148784c13630128ad18e9&quot;,
+            &quot;title&quot;: &quot;The Dark Knight&quot;,
+            &quot;description&quot;: &quot;When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.&quot;,
+            &quot;image&quot;: &quot;https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_UX182_CR0,0,182,268_AL_.jpg&quot;,
+            &quot;__v&quot;: 0,
+            &quot;createdAt&quot;: &quot;2021-03-04T20:52:08.417Z&quot;,
+            &quot;updatedAt&quot;: &quot;2021-03-04T20:52:08.417Z&quot;
+        },
+        {
+            &quot;stock&quot;: 0,
+            &quot;rental_price&quot;: 10,
+            &quot;sales_price&quot;: 20,
+            &quot;availability&quot;: true,
+            &quot;deleted&quot;: false,
+            &quot;_id&quot;: &quot;604148784c13630128ad18ea&quot;,
+            &quot;title&quot;: &quot;12 Angry Men&quot;,
+            &quot;description&quot;: &quot;A jury holdout attempts to prevent a miscarriage of justice by forcing his colleagues to reconsider the evidence.&quot;,
+            &quot;image&quot;: &quot;https://m.media-amazon.com/images/M/MV5BMWU4N2FjNzYtNTVkNC00NzQ0LTg0MjAtYTJlMjFhNGUxZDFmXkEyXkFqcGdeQXVyNjc1NTYyMjg@._V1_UX182_CR0,0,182,268_AL_.jpg&quot;,
+            &quot;__v&quot;: 0,
+            &quot;createdAt&quot;: &quot;2021-03-04T20:52:08.418Z&quot;,
+            &quot;updatedAt&quot;: &quot;2021-03-04T20:52:08.418Z&quot;
+        },
+        {
+            &quot;stock&quot;: 0,
+            &quot;rental_price&quot;: 10,
+            &quot;sales_price&quot;: 20,
+            &quot;availability&quot;: true,
+            &quot;deleted&quot;: false,
+            &quot;_id&quot;: &quot;604148784c13630128ad18eb&quot;,
+            &quot;title&quot;: &quot;Schindler's List&quot;,
+            &quot;description&quot;: &quot;In German-occupied Poland during World War II, industrialist Oskar Schindler gradually becomes concerned for his Jewish workforce after witnessing their persecution by the Nazis.&quot;,
+            &quot;image&quot;: &quot;https://m.media-amazon.com/images/M/MV5BNDE4OTMxMTctNmRhYy00NWE2LTg3YzItYTk3M2UwOTU5Njg4XkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_UX182_CR0,0,182,268_AL_.jpg&quot;,
+            &quot;__v&quot;: 0,
+            &quot;createdAt&quot;: &quot;2021-03-04T20:52:08.418Z&quot;,
+            &quot;updatedAt&quot;: &quot;2021-03-04T20:52:08.418Z&quot;
+        },
+        {
+            &quot;stock&quot;: 0,
+            &quot;rental_price&quot;: 10,
+            &quot;sales_price&quot;: 20,
+            &quot;availability&quot;: true,
+            &quot;deleted&quot;: false,
+            &quot;_id&quot;: &quot;604148784c13630128ad18ec&quot;,
+            &quot;title&quot;: &quot;The Lord of the Rings: The Return of the King&quot;,
+            &quot;description&quot;: &quot;Gandalf and Aragorn lead the World of Men against Sauron's army to draw his gaze from Frodo and Sam as they approach Mount Doom with the One Ring.&quot;,
+            &quot;image&quot;: &quot;https://m.media-amazon.com/images/M/MV5BNzA5ZDNlZWMtM2NhNS00NDJjLTk4NDItYTRmY2EwMWZlMTY3XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_UX182_CR0,0,182,268_AL_.jpg&quot;,
+            &quot;__v&quot;: 0,
+            &quot;createdAt&quot;: &quot;2021-03-04T20:52:08.418Z&quot;,
+            &quot;updatedAt&quot;: &quot;2021-03-04T20:52:08.418Z&quot;
+        },
+        {
+            &quot;stock&quot;: 0,
+            &quot;rental_price&quot;: 10,
+            &quot;sales_price&quot;: 20,
+            &quot;availability&quot;: true,
+            &quot;deleted&quot;: false,
+            &quot;_id&quot;: &quot;604148784c13630128ad18ed&quot;,
+            &quot;title&quot;: &quot;Pulp Fiction&quot;,
+            &quot;description&quot;: &quot;The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.&quot;,
+            &quot;image&quot;: &quot;https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_UY268_CR1,0,182,268_AL_.jpg&quot;,
+            &quot;__v&quot;: 0,
+            &quot;createdAt&quot;: &quot;2021-03-04T20:52:08.418Z&quot;,
+            &quot;updatedAt&quot;: &quot;2021-03-04T20:52:08.418Z&quot;
+        },
+        {
+            &quot;stock&quot;: 0,
+            &quot;rental_price&quot;: 10,
+            &quot;sales_price&quot;: 20,
+            &quot;availability&quot;: true,
+            &quot;deleted&quot;: false,
+            &quot;_id&quot;: &quot;604148784c13630128ad18ee&quot;,
+            &quot;title&quot;: &quot;The Good, the Bad and the Ugly&quot;,
+            &quot;description&quot;: &quot;A bounty hunting scam joins two men in an uneasy alliance against a third in a race to find a fortune in gold buried in a remote cemetery.&quot;,
+            &quot;image&quot;: &quot;https://m.media-amazon.com/images/M/MV5BOTQ5NDI3MTI4MF5BMl5BanBnXkFtZTgwNDQ4ODE5MDE@._V1_UX182_CR0,0,182,268_AL_.jpg&quot;,
+            &quot;__v&quot;: 0,
+            &quot;createdAt&quot;: &quot;2021-03-04T20:52:08.418Z&quot;,
+            &quot;updatedAt&quot;: &quot;2021-03-04T20:52:08.418Z&quot;
+        },
+        {
+            &quot;stock&quot;: 0,
+            &quot;rental_price&quot;: 10,
+            &quot;sales_price&quot;: 20,
+            &quot;availability&quot;: true,
+            &quot;deleted&quot;: false,
+            &quot;_id&quot;: &quot;604148784c13630128ad18ef&quot;,
+            &quot;title&quot;: &quot;The Lord of the Rings: The Fellowship of the Ring&quot;,
+            &quot;description&quot;: &quot;A meek Hobbit from the Shire and eight companions set out on a journey to destroy the powerful One Ring and save Middle-earth from the Dark Lord Sauron.&quot;,
+            &quot;image&quot;: &quot;https://m.media-amazon.com/images/M/MV5BN2EyZjM3NzUtNWUzMi00MTgxLWI0NTctMzY4M2VlOTdjZWRiXkEyXkFqcGdeQXVyNDUzOTQ5MjY@._V1_UX182_CR0,0,182,268_AL_.jpg&quot;,
+            &quot;__v&quot;: 0,
+            &quot;createdAt&quot;: &quot;2021-03-04T20:52:08.418Z&quot;,
+            &quot;updatedAt&quot;: &quot;2021-03-04T20:52:08.418Z&quot;
+        },
+        {
+            &quot;stock&quot;: 0,
+            &quot;rental_price&quot;: 10,
+            &quot;sales_price&quot;: 20,
+            &quot;availability&quot;: true,
+            &quot;deleted&quot;: false,
+            &quot;_id&quot;: &quot;604148784c13630128ad18f0&quot;,
+            &quot;title&quot;: &quot;Fight Club &quot;,
+            &quot;description&quot;: &quot;An insomniac office worker and a devil-may-care soapmaker form an underground fight club that evolves into something much, much more.&quot;,
+            &quot;image&quot;: &quot;https://m.media-amazon.com/images/M/MV5BMmEzNTkxYjQtZTc0MC00YTVjLTg5ZTEtZWMwOWVlYzY0NWIwXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_UX182_CR0,0,182,268_AL_.jpg&quot;,
+            &quot;__v&quot;: 0,
+            &quot;createdAt&quot;: &quot;2021-03-04T20:52:08.418Z&quot;,
+            &quot;updatedAt&quot;: &quot;2021-03-04T20:52:08.418Z&quot;
+        },
+        {
+            &quot;stock&quot;: 0,
+            &quot;rental_price&quot;: 10,
+            &quot;sales_price&quot;: 20,
+            &quot;availability&quot;: true,
+            &quot;deleted&quot;: false,
+            &quot;_id&quot;: &quot;604148784c13630128ad18f1&quot;,
+            &quot;title&quot;: &quot;Forrest Gump&quot;,
+            &quot;description&quot;: &quot;The presidencies of Kennedy and Johnson, the Vietnam War, the Watergate scandal and other historical events unfold from the perspective of an Alabama man with an IQ of 75, whose only desire is to be reunited with his childhood sweetheart.&quot;,
+            &quot;image&quot;: &quot;https://m.media-amazon.com/images/M/MV5BNWIwODRlZTUtY2U3ZS00Yzg1LWJhNzYtMmZiYmEyNmU1NjMzXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_UY268_CR1,0,182,268_AL_.jpg&quot;,
+            &quot;__v&quot;: 0,
+            &quot;createdAt&quot;: &quot;2021-03-04T20:52:08.418Z&quot;,
+            &quot;updatedAt&quot;: &quot;2021-03-04T20:52:08.418Z&quot;
+        },
+        {
+            &quot;stock&quot;: 0,
+            &quot;rental_price&quot;: 10,
+            &quot;sales_price&quot;: 20,
+            &quot;availability&quot;: true,
+            &quot;deleted&quot;: false,
+            &quot;_id&quot;: &quot;604148784c13630128ad18f2&quot;,
+            &quot;title&quot;: &quot;Inception&quot;,
+            &quot;description&quot;: &quot;A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.&quot;,
+            &quot;image&quot;: &quot;https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_UX182_CR0,0,182,268_AL_.jpg&quot;,
+            &quot;__v&quot;: 0,
+            &quot;createdAt&quot;: &quot;2021-03-04T20:52:08.419Z&quot;,
+            &quot;updatedAt&quot;: &quot;2021-03-04T20:52:08.419Z&quot;
+        },
+        {
+            &quot;stock&quot;: 0,
+            &quot;rental_price&quot;: 10,
+            &quot;sales_price&quot;: 20,
+            &quot;availability&quot;: true,
+            &quot;deleted&quot;: false,
+            &quot;_id&quot;: &quot;604148784c13630128ad18f3&quot;,
+            &quot;title&quot;: &quot;The Lord of the Rings: The Two Towers&quot;,
+            &quot;description&quot;: &quot;While Frodo and Sam edge closer to Mordor with the help of the shifty Gollum, the divided fellowship makes a stand against Sauron's new ally, Saruman, and his hordes of Isengard.&quot;,
+            &quot;image&quot;: &quot;https://m.media-amazon.com/images/M/MV5BZGMxZTdjZmYtMmE2Ni00ZTdkLWI5NTgtNjlmMjBiNzU2MmI5XkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_UX182_CR0,0,182,268_AL_.jpg&quot;,
+            &quot;__v&quot;: 0,
+            &quot;createdAt&quot;: &quot;2021-03-04T20:52:08.419Z&quot;,
+            &quot;updatedAt&quot;: &quot;2021-03-04T20:52:08.419Z&quot;
+        },
+        {
+            &quot;stock&quot;: 0,
+            &quot;rental_price&quot;: 10,
+            &quot;sales_price&quot;: 20,
+            &quot;availability&quot;: true,
+            &quot;deleted&quot;: false,
+            &quot;_id&quot;: &quot;604148784c13630128ad18f4&quot;,
+            &quot;title&quot;: &quot;Star Wars: Episode V - The Empire Strikes Back&quot;,
+            &quot;description&quot;: &quot;After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda, while his friends are pursued by Darth Vader and a bounty hunter named Boba Fett all over the galaxy.&quot;,
+            &quot;image&quot;: &quot;https://m.media-amazon.com/images/M/MV5BYmU1NDRjNDgtMzhiMi00NjZmLTg5NGItZDNiZjU5NTU4OTE0XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_UX182_CR0,0,182,268_AL_.jpg&quot;,
+            &quot;__v&quot;: 0,
+            &quot;createdAt&quot;: &quot;2021-03-04T20:52:08.419Z&quot;,
+            &quot;updatedAt&quot;: &quot;2021-03-04T20:52:08.419Z&quot;
+        },
+    ]
+}
+
+</code></pre>
+<h1>Get specific movie:</h1>
+<h3 id="resource-url-1">Resource URL</h3>
+<pre class="code-block"><code class="language-">GET /api/movies/:id
+</code></pre>
+<h3 id="result">Result</h3>
+<pre class="code-block"><code class="language-">&quot;document&quot;: [
+        {
+            &quot;stock&quot;: 0,
+            &quot;rental_price&quot;: 10,
+            &quot;sales_price&quot;: 20,
+            &quot;availability&quot;: true,
+            &quot;deleted&quot;: false,
+            &quot;_id&quot;: &quot;604148784c13630128ad18e6&quot;,
+            &quot;title&quot;: &quot;The Shawshank Redemption&quot;,
+            &quot;description&quot;: &quot;Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of     common decency.&quot;,
+            &quot;image&quot;: &quot;https://m.media-amazon.com/images/M/              MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_UX182_CR0,0,182,268_AL_.jpg&quot;,
+            &quot;__v&quot;: 0,
+            &quot;createdAt&quot;: &quot;2021-03-04T20:52:08.415Z&quot;,
+            &quot;updatedAt&quot;: &quot;2021-03-04T20:52:08.415Z&quot;
+        },
+]
+
+</code></pre>
+<h1>Search movies:</h1>
+<pre class="code-block"><code class="language-">POST /api/movies/search/title?
+</code></pre>
+<h3 id="example-response">Example response</h3>
+<pre class="code-block"><code class="language-">
+</code></pre>
+<h1>Add movie</h1>
+<pre class="code-block"><code class="language-">POST /api/movies
+</code></pre>
+<h3 id="required-parameters%3A">Required parameters:</h3>
+<pre class="code-block"><code class="language-">
+</code></pre>
+<h3 id="optional-parameters%3A">Optional parameters:</h3>
+<pre class="code-block"><code class="language-">
+</code></pre>
+<h3 id="result-1">Result</h3>
+<pre class="code-block"><code class="language-">HTTP Status Code 201 Created
+
+</code></pre>
+<h3 id="possible-error%2C-besides-errors-returned-from-db%3A">Possible error, besides errors returned from db:</h3>
+<pre class="code-block"><code class="language-">
+</code></pre>
+<h1>Delete movie</h1>
+<pre class="code-block"><code class="language-">DELETE /api/movies
+</code></pre>
+<h3 id="required-parameters%3A-1">Required parameters:</h3>
+<pre class="code-block"><code class="language-">
+</code></pre>
+<h3 id="optional-parameters%3A-1">Optional parameters:</h3>
+<pre class="code-block"><code class="language-">
+</code></pre>
+<h3 id="response">Response</h3>
+<pre class="code-block"><code class="language-">HTTP Status Code 204 No Content
+</code></pre>
+<h3 id="possible-error%2C-besides-errors-returned-from-db%3A-1">Possible error, besides errors returned from db:</h3>
+<pre class="code-block"><code class="language-">
+</code></pre>
+<h1>Update movie</h1>
+<pre class="code-block"><code class="language-">PUT /api/movies
+</code></pre>
+<h3 id="required-parameters%3A-2">Required parameters:</h3>
+<pre class="code-block"><code class="language-">
+</code></pre>
+<h3 id="optional-parameters%3A-2">Optional parameters:</h3>
+<pre class="code-block"><code class="language-">
+</code></pre>
+<h3 id="result-2">Result</h3>
+<pre class="code-block"><code class="language-">HTTP Status Code 204 No Content
+</code></pre>
+<h3 id="possible-error%2C-besides-errors-returned-from-db%3A-2">Possible error, besides errors returned from db:</h3>
+<pre class="code-block"><code class="language-">
+</code></pre>
+<h1>Register</h1>
+<h3 id="resource-url-2">Resource URL</h3>
+<pre class="code-block"><code class="language-">POST /api/register
+</code></pre>
+<h3 id="required-parameters%3A-3">Required parameters:</h3>
+<pre class="code-block"><code class="language-">
+</code></pre>
+<h3 id="result%3A-1">Result:</h3>
+<pre class="code-block"><code class="language-">{
+    &quot;message&quot;: &quot;User successfully registered.&quot;
+}
+</code></pre>
+<h1>Login</h1>
+<h3 id="resource-url-3">Resource URL</h3>
+<pre class="code-block"><code class="language-">POST /api/login
+</code></pre>
+<h3 id="required-parameters%3A-4">Required parameters:</h3>
+<pre class="code-block"><code class="language-">email
+password
+</code></pre>
+<h3 id="result%3A-2">Result:</h3>
+<pre class="code-block"><code class="language-">{
+    &quot;data&quot;: {
+        &quot;type&quot;: &quot;success&quot;,
+        &quot;message&quot;: &quot;User logged in&quot;,
+        &quot;user&quot;: {
+        &quot;api_key&quot;: &quot;...&quot;,
+        &quot;email&quot;: &quot;unknown@example.com&quot;
+        },
+        &quot;token&quot;: &quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey...&quot;
+    }
+}
+</code></pre>
+<p>N.B. The access token expires after 24 hours.</p>
+<h1>Rentals</h1>
+<h3 id="a-rental-has-the-following-attributes%3A">A rental has the following attributes:</h3>
+<pre class="code-block"><code class="language-">movie_id
+customer_id
+amount
+cost
+return_date
+returned
+rental_price
+penalty
+returnedAt
+createdAt
+updatedAt
+</code></pre>
+<h1>Purchases</h1>
+<h3 id="a-purchase-has-the-following-attributes%3A">A purchase has the following attributes:</h3>
+<pre class="code-block"><code class="language-">movie_id
+customer_id
+amount
+cost
+createdAt
+updatedAt
+</code></pre>
+
