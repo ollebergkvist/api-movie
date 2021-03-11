@@ -1,72 +1,38 @@
-const logger = require('../models/log.js');
+const logger = require('../models/log.js'); // Module to create logs
 const Movie = require('../schemas/movie.js'); // Movie mongoose schema
 const Rent = require('../schemas/rent.js'); // Rent mongoose schema
 const Purchase = require('../schemas/purchase.js'); // Purchase mongoose schema
 const aqp = require('api-query-params'); // Module to convert query params to mongodb query object
-const today = new Date();
-const date =
-	today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-const time =
-	today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-const dateTime = date + ' ' + time;
+const setPaginationOptions = require('../models/pagination_options.js'); // Helper function to set options for pagination depending on queries supplied
+const getCurrentDateAndTime = require('../models/date_time.js');
+const currentDateAndTime = getCurrentDateAndTime();
 
 logger.log({
 	level: 'info',
-	date: dateTime,
+	date: currentDateAndTime,
 	message: 'Hello distributed log files!',
 });
 
-// Sort recent record
-// sort({ _id: -1 }
-// {date: 1}
-// {date: -1}
-
-// { name: 1 } // ascending
-// { name: -1 } // descending
-// MongoClient.connect(url, function(err, db) {
-// 	if (err) throw err;
-// 	var dbo = db.db("mydb");
-// 	var mysort = { name: 1 };
-// 	dbo.collection("customers").find().sort(mysort).toArray(function(err, result) {
-// 	  if (err) throw err;
-// 	  console.log(result);
-// 	  db.close();
-// 	});
-//   });
-// .find().limit(5)
-
-//
-
-// GET /users?sort_by=first_name&order=asc
-// GET /users?sort_by=asc(email)
-// GET /users?limit=10
-
-// GET /users?page=3&results_per_page=20
-// Model.paginate({}, options, function (err, result) {
-// {availability: false}
-//   });
-
 // Controller for retrieving all movies
-// Pagination, sorting and filtering enabled
-const getMovies = async (req, res, next) => {
-	const sort = aqp(req.query).sort || null;
-	const limit = aqp(req.query).limit || null;
-	const filter = aqp(req.query).filter;
-	// console.log(aqp(req.query).filter);
-	// const { filter, limit, sort } = aqp(req.query);
-
-	const options = {
-		limit: req.query.limit,
-		page: req.query.page,
-	};
-
-	// if (!/\?.+/.test(req.url)) {d
-	// 	const sortByTitleAsc = {
-	// 		title: 1,
-	// 	};
+// Pagination, limiting, sorting and filtering enabled
+const getMovies = async (req, res) => {
+	const queryPage = aqp(req.query).filter.page;
+	const querySort = aqp(req.query).sort;
+	const queryLimit = aqp(req.query).limit;
+	const options = await setPaginationOptions(queryPage, querySort, queryLimit);
 
 	try {
-		const movies = await Movie.paginate(filter);
+		const movies = await Movie.paginate({ availability: true }, options);
+
+		if (!movies) {
+			res.status(409).json({
+				type: 'Error',
+				source: req.path,
+				detail: 'No movies available to fetch',
+				document: movies,
+			});
+		}
+
 		res.status(200).json({
 			type: 'Success',
 			source: req.path,
@@ -74,38 +40,55 @@ const getMovies = async (req, res, next) => {
 			document: movies,
 		});
 	} catch (err) {
-		res.status(404).json({
+		res.status(500).json({
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
 			message: err.message,
 		});
 	}
+};
 
-	// if (req.body.admin === 'admin' && req.query.sort) {
-	// 	try {
-	// 		const movies = await Movie.find(filter).sort(sort).limit(limit);
-	// 		res.status(200).json(movies);
-	// 	} catch (err) {
-	// 		res.status(404).json(err);
-	// 	}
-	// } else if (req.body.admin === 'admin' && !req.query.sort) {
-	// 	try {
-	// 		const movies = await Movie.find(filter).sort({ title: 1 }).limit(limit);
-	// 		res.status(200).json(movies);
-	// 	} catch (err) {
-	// 		res.status(404).json(err);
-	// 	}
-	// } else {
-	// 	try {
-	// 		const movies = await Movie.find({ availability: true })
-	// 			.sort(sort)
-	// 			.limit(limit);
-	// 		res.status(200).json(movies);
-	// 	} catch (err) {
-	// 		res.status(404).json(err);
-	// 	}
-	// }
+// Controller for retrieving all movies
+// Pagination, sorting and filtering enabled
+const getMoviesAdmin = async (req, res, next) => {
+	const filter = aqp(req.query).filter;
+	const queryPage = aqp(req.query).filter.page;
+	const querySort = aqp(req.query).sort;
+	const queryLimit = aqp(req.query).limit;
+
+	if (queryPage) {
+		delete filter.page;
+	}
+
+	const options = await setPaginationOptions(queryPage, querySort, queryLimit);
+
+	try {
+		const movies = await Movie.paginate(filter, options);
+
+		if (!movies) {
+			res.status(404).json({
+				type: 'Error',
+				source: req.path,
+				detail: 'No movies available to fetch',
+				document: movies,
+			});
+		}
+
+		res.status(200).json({
+			type: 'Success',
+			source: req.path,
+			detail: 'Movies fetched',
+			document: movies,
+		});
+	} catch (err) {
+		res.status(500).json({
+			type: 'Error',
+			source: req.path,
+			title: 'Database error',
+			message: err.message,
+		});
+	}
 };
 
 // Controller for retrieving a movie by ID
@@ -114,11 +97,18 @@ const getMovie = async (req, res) => {
 		const movie = await Movie.findById(req.params.id);
 
 		if (!movie) {
-			res.send(409).json({
+			res.status(404).json({
 				type: 'Error',
 				source: req.path,
 				detail: 'Movie with given id could not be found',
-				document: movies,
+			});
+		}
+
+		if (movie.availability === false) {
+			res.status(402).json({
+				type: 'Error',
+				source: req.path,
+				detail: 'Unauthorized resource targeted',
 			});
 		}
 
@@ -129,7 +119,36 @@ const getMovie = async (req, res) => {
 			document: movie,
 		});
 	} catch (err) {
-		return res.status(404).send({
+		return res.status(500).send({
+			type: 'Error',
+			source: req.path,
+			title: 'Database error',
+			message: err.message,
+		});
+	}
+};
+
+// Controller for retrieving a movie by ID
+const getMovieAdmin = async (req, res) => {
+	try {
+		const movie = await Movie.findById(req.params.id);
+
+		if (!movie) {
+			res.status(404).json({
+				type: 'Error',
+				source: req.path,
+				detail: 'Movie with given id could not be found',
+			});
+		}
+
+		return res.status(200).json({
+			type: 'Success',
+			source: req.path,
+			detail: 'Movie fetched',
+			document: movie,
+		});
+	} catch (err) {
+		return res.status(500).send({
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -146,8 +165,26 @@ const searchMovies = async (req, res) => {
 
 	try {
 		const movie = await Movie.find({
+			availability: true,
 			title: { $regex: req.query.title, $options: 'i' },
 		});
+
+		if (movie.length === 0) {
+			res.status(404).json({
+				type: 'Error',
+				source: req.path,
+				detail: 'Movie could not be found',
+			});
+		}
+
+		if (movie.availability === false) {
+			res.status(402).json({
+				type: 'Error',
+				source: req.path,
+				detail: 'Unauthorized resource targeted',
+			});
+		}
+
 		res.status(200).json({
 			type: 'Success',
 			source: req.path,
@@ -155,7 +192,42 @@ const searchMovies = async (req, res) => {
 			document: movie,
 		});
 	} catch (err) {
-		return res.status(404).send({
+		return res.status(500).send({
+			type: 'Error',
+			source: req.path,
+			title: 'Database error',
+			message: err.message,
+		});
+	}
+};
+
+// Controller for searching for movies
+const searchMoviesAdmin = async (req, res) => {
+	if (!req.query.title) {
+		res.status(404).send('Query string is missing');
+	}
+
+	try {
+		const movie = await Movie.find({
+			title: { $regex: req.query.title, $options: 'i' },
+		});
+
+		if (movie.length === 0) {
+			res.status(404).json({
+				type: 'Error',
+				source: req.path,
+				detail: 'Movie could not be found',
+			});
+		}
+
+		res.status(200).json({
+			type: 'Success',
+			source: req.path,
+			detail: 'Movie fetched',
+			document: movie,
+		});
+	} catch (err) {
+		return res.status(500).send({
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -166,6 +238,16 @@ const searchMovies = async (req, res) => {
 
 // Controller for creating a movie
 const createMovie = async (req, res) => {
+	const movieExists = await Movie.findOne({ title: req.body.title });
+
+	if (movieExists) {
+		return res.status(400).send({
+			type: 'Error',
+			source: req.path,
+			title: 'Movie exists already',
+		});
+	}
+
 	const movie = new Movie({
 		title: req.body.title,
 		description: req.body.description,
@@ -185,7 +267,7 @@ const createMovie = async (req, res) => {
 			document: movie,
 		});
 	} catch (err) {
-		return res.status(404).send({
+		return res.status(500).send({
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -196,15 +278,17 @@ const createMovie = async (req, res) => {
 
 // Controller for updating a movie
 const updateMovie = async (req, res, next) => {
-	const newMovie = { _id: req.params.id };
-	Movie.updateOne(newMovie, {
-		title: req.body.title,
-	})
+	Movie.updateOne(
+		{ _id: req.params.id },
+		{
+			title: req.body.title,
+		}
+	)
 		.then((document) => {
 			if (!document) {
 				return res.st(404).end();
 			}
-			return res.status(200).json(document);
+			return res.status(204).json(document);
 		})
 		.catch((err) => next(err));
 };
@@ -212,14 +296,25 @@ const updateMovie = async (req, res, next) => {
 // Controller for hard deleting a movie
 const deleteMovie = async (req, res, next) => {
 	try {
-		const movie = await Movie.deleteOne({ _id: req.params.id });
+		const movieExists = await Movie.findById(req.params.id);
+
+		if (!movieExists) {
+			return res.status(400).send({
+				type: 'Error',
+				source: req.path,
+				title: 'Movie with given id could not be found',
+			});
+		}
+
+		await Movie.deleteOne({ _id: req.params.id });
+
 		return res.status(204).json({
 			type: 'Success',
 			source: req.path,
 			message: 'Movie deleted successfully',
 		});
 	} catch (err) {
-		return res.status(404).send({
+		return res.status(500).send({
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -232,14 +327,24 @@ const deleteMovie = async (req, res, next) => {
 const removeMovie = async (req, res) => {
 	try {
 		const movie = await Movie.findById(req.params.id);
+
+		if (!movie) {
+			return res.status(400).send({
+				type: 'Error',
+				source: req.path,
+				title: 'Movie with given id could not be found',
+			});
+		}
+
 		movie.delete();
+
 		res.status(204).json({
 			type: 'Success',
 			source: req.path,
 			message: 'Movie successfully removed',
 		});
 	} catch (err) {
-		return res.status(404).send({
+		return res.status(500).send({
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -256,13 +361,22 @@ const availability = async (req, res) => {
 			{ availability: true },
 			{ new: true }
 		);
-		res.status(200).json({
+
+		if (!movie) {
+			return res.status(400).send({
+				type: 'Error',
+				source: req.path,
+				title: 'Movie with given id could not be found',
+			});
+		}
+
+		res.status(204).json({
 			type: 'Success',
 			source: req.path,
 			message: 'Movie availability successfully updated',
 		});
 	} catch (err) {
-		return res.status(404).send({
+		return res.status(500).send({
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -276,6 +390,14 @@ const rentMovie = async (req, res) => {
 	const movie = await Movie.findById(req.body.movie_id);
 	const movieStock = movie.stock;
 	const orderAmount = req.body.amount;
+
+	if (!movie) {
+		return res.status(400).send({
+			type: 'Error',
+			source: req.path,
+			title: 'Movie with given id could not be found',
+		});
+	}
 
 	// Checks that there are sufficient movies in stock to continue with the rental
 	if (movieStock >= orderAmount) {
@@ -294,7 +416,7 @@ const rentMovie = async (req, res) => {
 				stock: newStock,
 			});
 
-			return res.status(200).json({
+			return res.status(201).json({
 				type: 'Success',
 				source: req.path,
 				message: 'Movie successfully rented',
@@ -309,7 +431,7 @@ const rentMovie = async (req, res) => {
 			});
 		}
 	} else {
-		return res.status(200).json({
+		return res.status(500).json({
 			type: 'Error',
 			source: req.path,
 			message: 'Insufficient stock to complete order',
@@ -322,6 +444,14 @@ const purchaseMovie = async (req, res) => {
 	const movie = await Movie.findById(req.body.movie_id);
 	const movieStock = movie.stock;
 	const orderAmount = req.body.amount;
+
+	if (!movie) {
+		return res.status(400).send({
+			type: 'Error',
+			source: req.path,
+			title: 'Movie with given id could not be found',
+		});
+	}
 
 	if (movieStock >= orderAmount) {
 		const newStock = movieStock - orderAmount;
@@ -345,7 +475,7 @@ const purchaseMovie = async (req, res) => {
 				document: purchase,
 			});
 		} catch (err) {
-			return res.status(404).send({
+			return res.status(500).send({
 				type: 'Error',
 				source: req.path,
 				title: 'Database error',
@@ -392,7 +522,7 @@ const returnMovie = async (req, res) => {
 			rent.save();
 		}
 
-		return res.status(200).json({
+		return res.status(201).json({
 			type: 'Success',
 			source: req.path,
 			message: 'Movie successfully returned',
@@ -402,8 +532,11 @@ const returnMovie = async (req, res) => {
 
 module.exports = {
 	getMovies,
+	getMoviesAdmin,
 	getMovie,
+	getMovieAdmin,
 	searchMovies,
+	searchMoviesAdmin,
 	createMovie,
 	updateMovie,
 	deleteMovie,

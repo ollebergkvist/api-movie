@@ -8,20 +8,49 @@ const admin = require('../middleware/admin.js'); // Middleware to verify admin r
 const uploadImage = require('../middleware/upload-image.js'); //Middleware to upload images to server
 
 // Get all movies
+// Only movies that are marked available
 router.get('/movies', movieController.getMovies);
 
+// Get all movies
+// Movies that are marked available and unavailable
+// Admin only
+router.get('/admin/movies', auth, admin, movieController.getMoviesAdmin);
+
 // Get single movie by id
+// Only movies that are marked available
 router.get(
 	'/movies/:id',
 	validator.params(schemas.id),
 	movieController.getMovie
 );
 
+// Get single movie by id
+// Movies that are marked available and unavailable
+// Admin only
+router.get(
+	'/admin/movies/:id',
+	auth,
+	admin,
+	validator.params(schemas.id),
+	movieController.getMovieAdmin
+);
+
 // Search
+// Only movies that are marked available
 router.get(
 	'/search',
 	validator.query(schemas.search),
 	movieController.searchMovies
+);
+
+// Search
+// Admin only
+router.get(
+	'/admin/search',
+	auth,
+	admin,
+	validator.query(schemas.search),
+	movieController.searchMoviesAdmin
 );
 
 // Create movie
