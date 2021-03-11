@@ -1,34 +1,39 @@
 var mongoose = require('mongoose');
-mongoose.connect(
-	'mongodb+srv://ollebergkvist:76yCT7fyEA8TNcJB@cluster0.bhxhf.mongodb.net/movies?retryWrites=true&w=majority'
-);
-const newUser = require('../schemas/user.js');
+mongoose.connect('mongodb://localhost:27017/movies');
+const userSchema = require('../schemas/user.js');
+const bcrypt = require('bcryptjs');
 
-// User documents
-const user1 = new newUser({
-	email: 'admin@admin.com',
-	password: 'Password#1',
-	admin: true,
-});
+// Try to hash password and insert users
+const insertUsers = async (req, res) => {
+	const saltRounds = 10;
 
-const user2 = new newUser({
-	email: 'user@user.com',
-	password: 'Password#1',
-});
-
-// Users array
-const users = [user1, user2];
-
-// Insert users
-async function insertUsers() {
+	// Try to hash password
 	try {
-		const res = await newUser.insertMany(users);
-		console.log('Users successfully inserted in the users collection');
-		console.log(res);
+		var hashedPassword = await bcrypt.hash('Password#1', saltRounds);
 	} catch (err) {
-		console.error(err);
+		console.log(error);
 	}
-}
 
-// Call insertUsers
+	// Try to create user
+	try {
+		const newUser = new userSchema({
+			email: 'admin@admin.com',
+			admin: true,
+			password: hashedPassword,
+		});
+
+		const newUser2 = new userSchema({
+			email: 'user@user.com',
+			password: hashedPassword,
+		});
+
+		// Save users
+		await newUser.save();
+		await newUser2.save();
+		console.log('Users inserted in db');
+	} catch (err) {
+		console.log(err);
+	}
+};
+
 insertUsers();

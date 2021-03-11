@@ -1,7 +1,20 @@
+const logger = require('../models/log.js');
 const Movie = require('../schemas/movie.js'); // Movie mongoose schema
 const Rent = require('../schemas/rent.js'); // Rent mongoose schema
 const Purchase = require('../schemas/purchase.js'); // Purchase mongoose schema
 const aqp = require('api-query-params'); // Module to convert query params to mongodb query object
+const today = new Date();
+const date =
+	today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+const time =
+	today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+const dateTime = date + ' ' + time;
+
+logger.log({
+	level: 'info',
+	date: dateTime,
+	message: 'Hello distributed log files!',
+});
 
 // Sort recent record
 // sort({ _id: -1 }
@@ -39,7 +52,7 @@ const getMovies = async (req, res, next) => {
 	const sort = aqp(req.query).sort || null;
 	const limit = aqp(req.query).limit || null;
 	const filter = aqp(req.query).filter;
-	console.log(aqp(req.query).filter);
+	// console.log(aqp(req.query).filter);
 	// const { filter, limit, sort } = aqp(req.query);
 
 	const options = {

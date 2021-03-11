@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userSchema = require('../schemas/user.js');
+const Movie = require('../schemas/movie.js'); // Movie mongoose schema
 
 const updateUserRights = async (req, res) => {
 	try {
@@ -11,14 +12,14 @@ const updateUserRights = async (req, res) => {
 		);
 
 		if (!user) {
-			res.send(409).json({
+			return res.status(409).json({
 				type: 'Error',
 				source: req.path,
 				detail: 'User with given id could not be found',
 			});
 		}
 
-		res.status(200).json({
+		return res.status(200).json({
 			type: 'Success',
 			source: req.path,
 			detail: 'User rights updated successfully',
@@ -34,7 +35,7 @@ const updateUserRights = async (req, res) => {
 };
 
 const getUsers = (req, res) => {
-	Movie.find().then((users) => {
+	userSchema.find().then((users) => {
 		return res.status(200).json({
 			type: 'Success',
 			message: 'Users retrieved successfully',
@@ -45,7 +46,7 @@ const getUsers = (req, res) => {
 
 const getUser = async (req, res) => {
 	try {
-		const user = await User.findById(req.params.id);
+		const user = await userSchema.findById(req.params.id);
 
 		if (!user) {
 			res.send(409).json({
@@ -55,7 +56,7 @@ const getUser = async (req, res) => {
 			});
 		}
 
-		res.status(200).json({
+		return res.status(200).json({
 			type: 'Success',
 			source: req.path,
 			detail: 'User found',
@@ -98,7 +99,7 @@ const register = async (req, res) => {
 		// Checks if email address is registered already
 		const user = await userSchema.findOne({ email: req.body.email });
 		if (user) {
-			res.status(409).send({
+			return res.status(409).send({
 				type: 'Error',
 				source: req.path,
 				title: 'Registration error',
@@ -107,14 +108,14 @@ const register = async (req, res) => {
 		} else {
 			// Saves new user
 			await newUser.save();
-			res.status(201).send({
+			return res.status(201).send({
 				type: 'Success',
 				source: req.path,
 				detail: 'Registration succeeded',
 			});
 		}
 	} catch (err) {
-		res.status(500).send({
+		return res.status(500).send({
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -128,6 +129,14 @@ const login = async (req, res) => {
 	try {
 		// Try to find a user with given email
 		const user = await userSchema.findOne({ email: req.body.email });
+
+		if (!user) {
+			return res.status(409).json({
+				type: 'Error',
+				source: req.path,
+				detail: 'User with given id could not be found',
+			});
+		}
 
 		// Error handling if a user with given email was not found
 		if (!user) {
@@ -175,7 +184,7 @@ const login = async (req, res) => {
 			});
 		}
 	} catch (err) {
-		res.status(500).json({
+		return res.status(500).json({
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -186,22 +195,62 @@ const login = async (req, res) => {
 
 const addFavoriteMovie = async (req, res) => {
 	try {
-		const user = await User.findById(req.params.id);
+		const user = await userSchema.findById(req.body.id);
+		const movie = await Movie.findById(req.body.movie_id);
+
+		if (!movie) {
+			return res.status(409).json({
+				type: 'Error',
+				source: req.path,
+				detail: 'Movie with given id could not be found',
+			});
+		}
 
 		if (!user) {
-			res.send(409).json({
+			return res.status(409).json({
 				type: 'Error',
 				source: req.path,
 				detail: 'User with given id could not be found',
 			});
 		}
 
-		user.favorites.push({ movieID: req.body.movie_id });
-		user.save();
+		// Check if favorites array is empty
+		if (user.favorites.length === 0) {
+			console.log('Entered');
+			await user.favorites.push({ movieID: req.body.movie_id });
+			await user.save();
+			await movie.updateOne({ $inc: { likes: 1 } });
+
+			return res.status(200).json({
+				type: 'Success',
+				source: req.path,
+				detail:
+					'Movie added to user favorites and number of likes in given movie was incremented with 1',
+			});
+		}
+
+		const movieExists = await userSchema.findOne({
+			favorites: { $elemMatch: { movieID: req.body.movie_id } },
+		});
+
+		// // Check if movie already exists in user favorites
+		if (movieExists) {
+			return res.status(409).json({
+				type: 'Error',
+				source: req.path,
+				detail: "Movie has already been added to user's favorites",
+			});
+		}
+
+		await user.favorites.push({ movieID: req.body.movie_id });
+		await user.save();
+		await movie.updateOne({ $inc: { likes: 1 } });
+
 		return res.status(200).json({
 			type: 'Success',
 			source: req.path,
-			detail: 'Movie added to user favorites',
+			detail:
+				'Movie added to user favorites and number of likes in given movie was incremented with 1',
 		});
 	} catch (err) {
 		console.log({

@@ -17,6 +17,7 @@ const schemas = {
 		id: Joi.string().required(),
 	}),
 	favorite: Joi.object({
+		id: Joi.string().required(),
 		movie_id: Joi.string().required(),
 	}),
 	create: Joi.object({

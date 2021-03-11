@@ -1,11 +1,9 @@
-const fs = require('fs');
+const winston = require('winston');
 
-const logger = fs.createWriteStream('../log/log.txt', {
-	flags: 'a',
+const logger = winston.createLogger({
+	format: winston.format.json(),
+	showLevel: false,
+	transports: [new winston.transports.File({ filename: '../log/movies.log' })],
 });
 
 module.exports = logger;
-
-// for (let i = 0; i < 10; i++) {
-// 	logger.write(i.toString() + '\r\n'); //'\r\n at the end of each value
-// }

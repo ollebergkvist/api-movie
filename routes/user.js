@@ -21,7 +21,7 @@ router.get('/users', auth, admin, userController.getUsers);
 
 // Get user by id
 router.get(
-	'/user/:id',
+	'/users/:id',
 	auth,
 	admin,
 	validator.params(schemas.id),
@@ -40,9 +40,8 @@ router.post('/login', validator.body(schemas.login), userController.login);
 
 // Like movie
 router.put(
-	'/favorite/:id',
+	'/favorite',
 	auth,
-	validator.params(schemas.id),
 	validator.body(schemas.favorite),
 	userController.addFavoriteMovie
 );
