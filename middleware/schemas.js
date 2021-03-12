@@ -59,5 +59,8 @@ const schemas = {
 		email: Joi.string().email().required(),
 		password: Joi.string().required(),
 	}),
+	updateUser: Joi.object({
+		admin: Joi.boolean().required(),
+	}),
 };
 module.exports = schemas;

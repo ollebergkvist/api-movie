@@ -91,7 +91,7 @@ router.delete(
 
 // Remove movie (Soft delete)
 // Admin only
-router.post(
+router.put(
 	'/remove/:id',
 	auth,
 	admin,
@@ -102,7 +102,7 @@ router.post(
 // Change availability of movie by id
 // Admin only
 router.put(
-	'/movies/availability/:id',
+	'/availability/:id',
 	auth,
 	admin,
 	validator.params(schemas.id),
@@ -129,8 +129,8 @@ router.post(
 
 // Return movie
 // Admin only
-router.post(
-	'/movies/return/:id',
+router.put(
+	'/return/:id',
 	auth,
 	admin,
 	validator.params(schemas.id),

@@ -9,7 +9,7 @@ const Movie = require('../schemas/movie.js'); // Movie mongoose schema
 // Controller for updating a user´s rights
 const updateUserRights = async (req, res) => {
 	try {
-		const user = await User.findByIdAndUpdate(
+		const user = await userSchema.findByIdAndUpdate(
 			req.params.id,
 			{ admin: req.body.admin },
 			{ new: true }
@@ -23,7 +23,7 @@ const updateUserRights = async (req, res) => {
 			});
 		}
 
-		return res.status(200).json({
+		return res.status(204).json({
 			type: 'Success',
 			source: req.path,
 			detail: 'User rights updated successfully',

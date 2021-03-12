@@ -9,11 +9,11 @@ const admin = require('../middleware/admin.js'); // Middleware to verify admin r
 // Update user permissions
 // Admin only
 router.put(
-	'/user/:id',
+	'/users/:id',
 	auth,
 	admin,
 	validator.params(schemas.id),
-	validator.body(schemas.id),
+	validator.body(schemas.updateUser),
 	userController.updateUserRights
 );
 

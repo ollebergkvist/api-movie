@@ -583,7 +583,7 @@ const purchaseMovie = async (req, res) => {
 			});
 		}
 	} else {
-		return res.status(200).json({
+		return res.status(400).json({
 			type: 'Error',
 			source: req.path,
 			message: 'Insufficient stock to complete order',
@@ -594,7 +594,16 @@ const purchaseMovie = async (req, res) => {
 // Controller for renting a movie
 const returnMovie = async (req, res) => {
 	try {
-		var rent = await Rent.findById(req.body.id);
+		var rent = await Rent.findById(req.params.id);
+
+		// Check if Order exists in db
+		if (!rent) {
+			return res.status(400).send({
+				type: 'Error',
+				source: req.path,
+				title: 'Rental order with given id could not be found',
+			});
+		}
 	} catch (err) {
 		return res.status(404).send({
 			type: 'Error',
