@@ -4,3 +4,4 @@
 /.dockerignore
 /coverage
 /log/log.txt
+/data
