@@ -1,7 +1,5 @@
 /node_modules
 /.env
-/uploads
 /.dockerignore
 /coverage
-/log/log.txt
 /data
