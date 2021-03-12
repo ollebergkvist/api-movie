@@ -1,3 +1,6 @@
+// Movie controller
+// Handles db logic
+
 const Movie = require('../schemas/movie.js'); // Movie mongoose schema
 const User = require('../schemas/user.js'); // User mongoose schema
 const Rent = require('../schemas/rent.js'); // Rent mongoose schema

@@ -1,7 +1,10 @@
-const getCurrentDateAndTime = require('../models/date_time.js'); // Helper function to get and format date and time
+// Module to create data object
+// Conditions based on req.body params
+
+const getCurrentDateAndTime = require('../models/date_time.js'); //  Get current date and time formatted
 
 const setLoggingData = async (...queries) => {
-	const currentDateAndTime = await getCurrentDateAndTime(); // Get timestamp
+	const currentDateAndTime = await getCurrentDateAndTime();
 	const movieTitle = queries[0];
 	const salesPrice = queries[1];
 	const rentalPrice = queries[2];

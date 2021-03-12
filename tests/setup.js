@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
-const Users = require('../schemas/user.js');
+const Users = require('../schemas/user.js'); // Mongoose schema
 
+// Create db connection before each test
 beforeEach(async (done) => {
 	try {
 		await mongoose.connect(
@@ -22,6 +23,7 @@ beforeEach(async (done) => {
 	}
 });
 
+// Drop db and close connection after each test
 afterEach((done) => {
 	try {
 		mongoose.connection.db.dropDatabase(() => {

@@ -1,7 +1,6 @@
 const supertest = require('supertest');
 const createServer = require('../../models/server.js');
 const Movies = require('../../schemas/movie.js');
-const Users = require('../../schemas/user.js');
 const app = createServer();
 process.env.TEST_SUITE = 'test';
 

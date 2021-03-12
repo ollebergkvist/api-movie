@@ -1,3 +1,6 @@
+// Module to get current date and time
+// YYYY-MM-DD HH:MM:SS
+
 const getCurrentDateAndTime = async () => {
 	const today = new Date();
 	const date =

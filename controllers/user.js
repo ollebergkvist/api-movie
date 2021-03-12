@@ -1,8 +1,12 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const userSchema = require('../schemas/user.js');
+// User controller
+// Handles db logic
+
+const bcrypt = require('bcryptjs'); // Password-hashing module
+const jwt = require('jsonwebtoken'); // Create and valide JWT
+const userSchema = require('../schemas/user.js'); // User mongoose schema
 const Movie = require('../schemas/movie.js'); // Movie mongoose schema
 
+// Controller for updating a user´s rights
 const updateUserRights = async (req, res) => {
 	try {
 		const user = await User.findByIdAndUpdate(
@@ -34,6 +38,7 @@ const updateUserRights = async (req, res) => {
 	}
 };
 
+// Controller for fetching all users
 const getUsers = (req, res) => {
 	userSchema.find().then((users) => {
 		return res.status(200).json({
@@ -44,6 +49,7 @@ const getUsers = (req, res) => {
 	});
 };
 
+// Controller for fetching a user by id
 const getUser = async (req, res) => {
 	try {
 		const user = await userSchema.findById(req.params.id);
@@ -72,6 +78,7 @@ const getUser = async (req, res) => {
 	}
 };
 
+// Controller for registering account
 const register = async (req, res) => {
 	const saltRounds = 10;
 
@@ -124,6 +131,7 @@ const register = async (req, res) => {
 	}
 };
 
+// Controller for login
 const login = async (req, res) => {
 	const secret = process.env.SECRET;
 	try {
@@ -193,6 +201,7 @@ const login = async (req, res) => {
 	}
 };
 
+// Controller for adding a favorite movie to user's favorites and increments given movie's number of likes
 const addFavoriteMovie = async (req, res) => {
 	try {
 		const user = await userSchema.findById(req.body.id);

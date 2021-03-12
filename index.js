@@ -1,7 +1,8 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
-const createServer = require('./models/server.js');
+require('dotenv').config(); // Loads environment variables from a .env file into process.env
+const mongoose = require('mongoose'); // Object modeling tool designed to work in an asynchronous environment
+const createServer = require('./models/server.js'); // Express server module
 
+// Set environment variables depending on build
 if (process.env.NODE_ENV === 'test') {
 	uri = 'mongodb://localhost:27017/movies';
 	port = 3000;
@@ -10,6 +11,7 @@ if (process.env.NODE_ENV === 'test') {
 	port = process.env.PORT;
 }
 
+// Create db connection
 const connection = mongoose
 	.connect(uri, {
 		useFindAndModify: false,
@@ -27,6 +29,7 @@ const connection = mongoose
 		}
 	})
 	.then(() => {
+		// Start express server on given port
 		const app = createServer();
 		app.listen(port, () => {
 			console.log(`Server listening on ${port} `);

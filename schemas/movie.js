@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const schema = mongoose.Schema;
-const mongoosePaginate = require('mongoose-paginate-v2');
-const mongoose_delete = require('mongoose-delete');
+const mongoosePaginate = require('mongoose-paginate-v2'); //  Cursor based pagination library
+const mongoose_delete = require('mongoose-delete'); // Enables soft deletion of documents in MongoDB
 
 const movieSchema = new schema(
 	{
@@ -20,4 +20,4 @@ const movieSchema = new schema(
 movieSchema.plugin(mongoosePaginate);
 movieSchema.plugin(mongoose_delete, { deletedAt: true });
 
-const Movie = (module.exports = mongoose.model('Movie', movieSchema, 'movies'));
+module.exports = mongoose.model('Movie', movieSchema, 'movies');

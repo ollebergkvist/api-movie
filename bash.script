@@ -1,3 +1,0 @@
-#!/usr/bin/env 
-node insert_users.js
-node insert_movies.js

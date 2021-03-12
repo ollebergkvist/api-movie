@@ -11,8 +11,4 @@ const purchaseSchema = new schema(
 	{ timestamps: true }
 );
 
-const Purchase = (module.exports = mongoose.model(
-	'Purchase',
-	purchaseSchema,
-	'purchases'
-));
+module.exports = mongoose.model('Purchase', purchaseSchema, 'purchases');

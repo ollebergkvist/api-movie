@@ -1,6 +1,9 @@
+// Module to seed db with users
+// Not needed in case the db is restored from /db/dump/movies.archive
+
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/movies');
-const userSchema = require('../schemas/user.js');
+const userSchema = require('../../schemas/user.js');
 const bcrypt = require('bcryptjs');
 
 // Try to hash password and insert users

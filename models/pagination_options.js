@@ -1,3 +1,6 @@
+// Module to set options for the pagination method
+// Conditions based on req.body params
+
 const setPaginationOptions = async (...queries) => {
 	const queryPage = queries[0];
 	const querySort = queries[1];

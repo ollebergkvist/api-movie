@@ -15,4 +15,4 @@ const rentSchema = new schema(
 	{ timestamps: true }
 );
 
-const Rent = (module.exports = mongoose.model('Rent', rentSchema, 'rentals'));
+module.exports = mongoose.model('Rent', rentSchema, 'rentals');

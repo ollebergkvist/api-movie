@@ -1,10 +1,12 @@
+// Module to create express instance
+
 const express = require('express');
 const movieRoutes = require('../routes/movie.js');
 const userRoutes = require('../routes/user.js');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const compression = require('compression');
-const cors = require('cors');
+const helmet = require('helmet'); // Secures app by setting various HTTP headers
+const morgan = require('morgan'); // HTTP request logger middleware
+const compression = require('compression'); // Enables gzip compression
+const cors = require('cors'); // Enables CORS
 
 function createServer() {
 	const app = express(); // Binds express to app

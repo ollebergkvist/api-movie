@@ -8,6 +8,7 @@ const admin = require('../middleware/admin.js'); // Middleware to verify admin r
 const uploadImage = require('../middleware/upload-image.js'); //Middleware to upload images to server
 
 // Get all movies
+// All users
 // Only movies that are marked available
 router.get('/movies', movieController.getMovies);
 
@@ -17,6 +18,7 @@ router.get('/movies', movieController.getMovies);
 router.get('/admin/movies', auth, admin, movieController.getMoviesAdmin);
 
 // Get single movie by id
+// All users
 // Only movies that are marked available
 router.get(
 	'/movies/:id',
@@ -36,6 +38,7 @@ router.get(
 );
 
 // Search
+// All users
 // Only movies that are marked available
 router.get(
 	'/search',
@@ -54,6 +57,7 @@ router.get(
 );
 
 // Create movie
+// Admin only
 router.post(
 	'/movies',
 	auth,
@@ -64,6 +68,7 @@ router.post(
 );
 
 // Update movie
+// Admin only
 router.put(
 	'/movies/:id',
 	auth,
@@ -75,6 +80,7 @@ router.put(
 );
 
 // Delete movie (Hard delete)
+// Admin only
 router.delete(
 	'/movies/:id',
 	auth,
@@ -84,6 +90,7 @@ router.delete(
 );
 
 // Remove movie (Soft delete)
+// Admin only
 router.post(
 	'/remove/:id',
 	auth,
@@ -93,6 +100,7 @@ router.post(
 );
 
 // Change availability of movie by id
+// Admin only
 router.put(
 	'/movies/availability/:id',
 	auth,
@@ -102,6 +110,7 @@ router.put(
 );
 
 // Rent movie
+// Registered users
 router.post(
 	'/movies/rent',
 	auth,
@@ -110,6 +119,7 @@ router.post(
 );
 
 // Purchase movie
+// Registered users
 router.post(
 	'/movies/purchase',
 	auth,
@@ -118,6 +128,7 @@ router.post(
 );
 
 // Return movie
+// Admin only
 router.post(
 	'/movies/return/:id',
 	auth,
