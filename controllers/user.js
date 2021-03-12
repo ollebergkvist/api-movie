@@ -17,6 +17,7 @@ const updateUserRights = async (req, res) => {
 
 		if (!user) {
 			return res.status(400).json({
+				status: '400',
 				type: 'Error',
 				source: req.path,
 				detail: 'User with given id could not be found',
@@ -24,12 +25,14 @@ const updateUserRights = async (req, res) => {
 		}
 
 		return res.status(204).json({
+			status: '204',
 			type: 'Success',
 			source: req.path,
 			detail: 'User rights updated successfully',
 		});
 	} catch (err) {
 		return res.status(404).send({
+			status: '404',
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -42,6 +45,7 @@ const updateUserRights = async (req, res) => {
 const getUsers = (req, res) => {
 	userSchema.find().then((users) => {
 		return res.status(200).json({
+			status: '200',
 			type: 'Success',
 			message: 'Users retrieved successfully',
 			documents: users,
@@ -56,6 +60,7 @@ const getUser = async (req, res) => {
 
 		if (!user) {
 			res.status(400).json({
+				status: '400',
 				type: 'Error',
 				source: req.path,
 				detail: 'User with given id could not be found',
@@ -63,6 +68,7 @@ const getUser = async (req, res) => {
 		}
 
 		return res.status(200).json({
+			status: '200',
 			type: 'Success',
 			source: req.path,
 			detail: 'User found',
@@ -70,6 +76,7 @@ const getUser = async (req, res) => {
 		});
 	} catch (err) {
 		return res.status(404).send({
+			status: '404',
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -88,6 +95,7 @@ const register = async (req, res) => {
 	} catch (err) {
 		return res.status(500).json({
 			errors: {
+				status: '500',
 				type: 'Error',
 				source: req.path,
 				title: 'Bcrypt error',
@@ -107,6 +115,7 @@ const register = async (req, res) => {
 		const user = await userSchema.findOne({ email: req.body.email });
 		if (user) {
 			return res.status(400).send({
+				status: '400',
 				type: 'Error',
 				source: req.path,
 				title: 'Registration error',
@@ -116,6 +125,7 @@ const register = async (req, res) => {
 			// Saves new user
 			await newUser.save();
 			return res.status(201).send({
+				status: '201',
 				type: 'Success',
 				source: req.path,
 				detail: 'Registration succeeded',
@@ -123,6 +133,7 @@ const register = async (req, res) => {
 		}
 	} catch (err) {
 		return res.status(500).send({
+			status: '500',
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -138,17 +149,10 @@ const login = async (req, res) => {
 		// Try to find a user with given email
 		const user = await userSchema.findOne({ email: req.body.email });
 
-		if (!user) {
-			return res.status(400).json({
-				type: 'Error',
-				source: req.path,
-				detail: 'User with given id could not be found',
-			});
-		}
-
 		// Error handling if a user with given email was not found
 		if (!user) {
 			res.status(400).send({
+				status: '400',
 				type: 'Error',
 				source: req.path,
 				title: 'Authorization error',
@@ -159,6 +163,7 @@ const login = async (req, res) => {
 			bcrypt.compare(req.body.password, user.password, (err, result) => {
 				if (err) {
 					return res.status(500).json({
+						status: '500',
 						type: 'Error',
 						source: req.path,
 						title: 'Bcrypt error',
@@ -168,6 +173,7 @@ const login = async (req, res) => {
 
 				if (!result) {
 					return res.status(401).json({
+						status: '401',
 						type: 'Error',
 						source: req.path,
 						title: 'Authorization error',
@@ -182,6 +188,7 @@ const login = async (req, res) => {
 				});
 
 				return res.status(200).json({
+					status: '200',
 					type: 'Success',
 					source: req.path,
 					detail: 'User logged in',
@@ -193,6 +200,7 @@ const login = async (req, res) => {
 		}
 	} catch (err) {
 		return res.status(500).json({
+			status: '500',
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -209,6 +217,7 @@ const addFavoriteMovie = async (req, res) => {
 
 		if (!movie) {
 			return res.status(400).json({
+				status: '400',
 				type: 'Error',
 				source: req.path,
 				detail: 'Movie with given id could not be found',
@@ -217,6 +226,7 @@ const addFavoriteMovie = async (req, res) => {
 
 		if (!user) {
 			return res.status(400).json({
+				status: '400',
 				type: 'Error',
 				source: req.path,
 				detail: 'User with given id could not be found',
@@ -231,6 +241,7 @@ const addFavoriteMovie = async (req, res) => {
 			await movie.updateOne({ $inc: { likes: 1 } });
 
 			return res.status(200).json({
+				status: '200',
 				type: 'Success',
 				source: req.path,
 				detail:
@@ -245,6 +256,7 @@ const addFavoriteMovie = async (req, res) => {
 		// // Check if movie already exists in user favorites
 		if (movieExists) {
 			return res.status(400).json({
+				status: '400',
 				type: 'Error',
 				source: req.path,
 				detail: "Movie has already been added to user's favorites",
@@ -256,13 +268,15 @@ const addFavoriteMovie = async (req, res) => {
 		await movie.updateOne({ $inc: { likes: 1 } });
 
 		return res.status(200).json({
+			status: '200',
 			type: 'Success',
 			source: req.path,
 			detail:
 				'Movie added to user favorites and number of likes in given movie was incremented with 1',
 		});
 	} catch (err) {
-		console.log({
+		return res.status(200).json({
+			status: '500',
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',

@@ -14,9 +14,9 @@ Create .env file: touch .env
 
 Create folders: mkdir uploads logs
 
-Start development: run npm dev
+Start development: npm run dev
 
-Start production: run npm start
+Start production: npm run start
 ```
 
 # Environment variables
@@ -94,18 +94,19 @@ POST /login
 
 ```
 Routes secured with JWT plus admin rights:
-POST /api/movies
-PUT /api/movies/:id
+GET /admin/movies
+GET /admin/movies/:id
+GET /admin/search
+POST /movies
+PUT /movies/:id
 DELETE /movies/:id
 POST /remove/:id
 PUT /availability/:id
-POST /return/:id
+PUT /return/:id
 GET /users
 PUT /users/:id
 
 ```
-
-All other routes are open to the general public.
 
 ## Movies
 
@@ -311,7 +312,6 @@ GET /api/movies/:id
 
 ```
 Regular users can only fetch movies marked as available in the collection.
-
 ```
 
 ### Example

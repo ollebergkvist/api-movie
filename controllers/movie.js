@@ -32,7 +32,8 @@ const getMovies = async (req, res) => {
 		const movies = await Movie.paginate({ availability: true }, options);
 
 		if (!movies) {
-			res.status(409).json({
+			res.status(404).json({
+				status: '404',
 				type: 'Error',
 				source: req.path,
 				detail: 'No movies available to fetch',
@@ -41,6 +42,7 @@ const getMovies = async (req, res) => {
 		}
 
 		res.status(200).json({
+			status: '200',
 			type: 'Success',
 			source: req.path,
 			detail: 'Movies fetched',
@@ -48,6 +50,7 @@ const getMovies = async (req, res) => {
 		});
 	} catch (err) {
 		res.status(500).json({
+			status: '500',
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -75,6 +78,7 @@ const getMoviesAdmin = async (req, res, next) => {
 
 		if (!movies) {
 			res.status(404).json({
+				status: '404',
 				type: 'Error',
 				source: req.path,
 				detail: 'No movies available to fetch',
@@ -83,6 +87,7 @@ const getMoviesAdmin = async (req, res, next) => {
 		}
 
 		res.status(200).json({
+			status: '200',
 			type: 'Success',
 			source: req.path,
 			detail: 'Movies fetched',
@@ -90,6 +95,7 @@ const getMoviesAdmin = async (req, res, next) => {
 		});
 	} catch (err) {
 		res.status(500).json({
+			status: '500',
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -105,6 +111,7 @@ const getMovie = async (req, res) => {
 
 		if (!movie) {
 			res.status(404).json({
+				status: '404',
 				type: 'Error',
 				source: req.path,
 				detail: 'Movie with given id could not be found',
@@ -113,6 +120,7 @@ const getMovie = async (req, res) => {
 
 		if (movie.availability === false) {
 			res.status(402).json({
+				status: '402',
 				type: 'Error',
 				source: req.path,
 				detail: 'Unauthorized resource targeted',
@@ -120,6 +128,7 @@ const getMovie = async (req, res) => {
 		}
 
 		return res.status(200).json({
+			status: '200',
 			type: 'Success',
 			source: req.path,
 			detail: 'Movie fetched',
@@ -127,6 +136,7 @@ const getMovie = async (req, res) => {
 		});
 	} catch (err) {
 		return res.status(500).send({
+			status: '500',
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -142,6 +152,7 @@ const getMovieAdmin = async (req, res) => {
 
 		if (!movie) {
 			res.status(404).json({
+				status: '404',
 				type: 'Error',
 				source: req.path,
 				detail: 'Movie with given id could not be found',
@@ -149,6 +160,7 @@ const getMovieAdmin = async (req, res) => {
 		}
 
 		return res.status(200).json({
+			status: '200',
 			type: 'Success',
 			source: req.path,
 			detail: 'Movie fetched',
@@ -156,6 +168,7 @@ const getMovieAdmin = async (req, res) => {
 		});
 	} catch (err) {
 		return res.status(500).send({
+			status: '500',
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -178,6 +191,7 @@ const searchMovies = async (req, res) => {
 
 		if (movie.length === 0) {
 			res.status(404).json({
+				status: '404',
 				type: 'Error',
 				source: req.path,
 				detail: 'Movie could not be found',
@@ -186,6 +200,7 @@ const searchMovies = async (req, res) => {
 
 		if (movie.availability === false) {
 			res.status(402).json({
+				status: '402',
 				type: 'Error',
 				source: req.path,
 				detail: 'Unauthorized resource targeted',
@@ -193,6 +208,7 @@ const searchMovies = async (req, res) => {
 		}
 
 		res.status(200).json({
+			status: '200',
 			type: 'Success',
 			source: req.path,
 			detail: 'Movie fetched',
@@ -200,6 +216,7 @@ const searchMovies = async (req, res) => {
 		});
 	} catch (err) {
 		return res.status(500).send({
+			status: '500',
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -221,6 +238,7 @@ const searchMoviesAdmin = async (req, res) => {
 
 		if (movie.length === 0) {
 			res.status(404).json({
+				status: '404',
 				type: 'Error',
 				source: req.path,
 				detail: 'Movie could not be found',
@@ -228,6 +246,7 @@ const searchMoviesAdmin = async (req, res) => {
 		}
 
 		res.status(200).json({
+			status: '200',
 			type: 'Success',
 			source: req.path,
 			detail: 'Movie fetched',
@@ -235,6 +254,7 @@ const searchMoviesAdmin = async (req, res) => {
 		});
 	} catch (err) {
 		return res.status(500).send({
+			status: '500',
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -248,6 +268,7 @@ const createMovie = async (req, res) => {
 	const movieExists = await Movie.findOne({ title: req.body.title });
 	if (movieExists) {
 		return res.status(400).send({
+			status: '400',
 			type: 'Error',
 			source: req.path,
 			title: 'Movie exists already',
@@ -267,6 +288,7 @@ const createMovie = async (req, res) => {
 	try {
 		movie.save();
 		return res.status(201).json({
+			status: '201',
 			type: 'Success',
 			source: req.path,
 			message: 'Movie successfully created',
@@ -274,6 +296,7 @@ const createMovie = async (req, res) => {
 		});
 	} catch (err) {
 		return res.status(500).send({
+			status: '500',
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -297,6 +320,7 @@ const updateMovie = async (req, res, next) => {
 
 		if (!movie) {
 			return res.status(400).send({
+				status: '400',
 				type: 'Error',
 				source: req.path,
 				title: 'Movie with given id could not be found',
@@ -321,12 +345,14 @@ const updateMovie = async (req, res, next) => {
 		logger.log(data);
 
 		return res.status(204).json({
+			status: '204',
 			type: 'Success',
 			source: req.path,
 			message: 'Movie updated successfully',
 		});
 	} catch (err) {
 		return res.status(500).send({
+			status: '500',
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -342,6 +368,7 @@ const deleteMovie = async (req, res, next) => {
 
 		if (!movieExists) {
 			return res.status(400).send({
+				status: '400',
 				type: 'Error',
 				source: req.path,
 				title: 'Movie with given id could not be found',
@@ -351,12 +378,14 @@ const deleteMovie = async (req, res, next) => {
 		await Movie.deleteOne({ _id: req.params.id });
 
 		return res.status(204).json({
+			status: '204',
 			type: 'Success',
 			source: req.path,
 			message: 'Movie deleted successfully',
 		});
 	} catch (err) {
 		return res.status(500).send({
+			status: '500',
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -372,6 +401,7 @@ const removeMovie = async (req, res) => {
 
 		if (!movie) {
 			return res.status(400).send({
+				status: '400',
 				type: 'Error',
 				source: req.path,
 				title: 'Movie with given id could not be found',
@@ -381,12 +411,14 @@ const removeMovie = async (req, res) => {
 		movie.delete();
 
 		res.status(204).json({
+			status: '204',
 			type: 'Success',
 			source: req.path,
 			message: 'Movie successfully removed',
 		});
 	} catch (err) {
 		return res.status(500).send({
+			status: '500',
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -406,6 +438,7 @@ const availability = async (req, res) => {
 
 		if (!movie) {
 			return res.status(400).send({
+				status: '400',
 				type: 'Error',
 				source: req.path,
 				title: 'Movie with given id could not be found',
@@ -413,12 +446,14 @@ const availability = async (req, res) => {
 		}
 
 		res.status(204).json({
+			status: '204',
 			type: 'Success',
 			source: req.path,
 			message: 'Movie availability successfully updated',
 		});
 	} catch (err) {
 		return res.status(500).send({
+			status: '500',
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -437,6 +472,7 @@ const rentMovie = async (req, res) => {
 	// Check if movie exists in db
 	if (!movie) {
 		return res.status(400).send({
+			status: '400',
 			type: 'Error',
 			source: req.path,
 			title: 'Movie with given id could not be found',
@@ -446,6 +482,7 @@ const rentMovie = async (req, res) => {
 	// Check if movie exists in db
 	if (!user) {
 		return res.status(400).send({
+			status: '400',
 			type: 'Error',
 			source: req.path,
 			title: 'User with given id could not be found',
@@ -473,6 +510,7 @@ const rentMovie = async (req, res) => {
 			});
 
 			return res.status(201).json({
+				status: '201',
 				type: 'Success',
 				source: req.path,
 				message: 'Movie successfully rented',
@@ -480,6 +518,7 @@ const rentMovie = async (req, res) => {
 			});
 		} catch (err) {
 			return res.status(404).send({
+				status: '404',
 				type: 'Error',
 				source: req.path,
 				title: 'Database error',
@@ -504,6 +543,7 @@ const rentMovie = async (req, res) => {
 		}
 	} else {
 		return res.status(500).json({
+			status: '500',
 			type: 'Error',
 			source: req.path,
 			message: 'Insufficient stock to complete order',
@@ -521,6 +561,7 @@ const purchaseMovie = async (req, res) => {
 	// Check if movie exists in db
 	if (!movie) {
 		return res.status(400).send({
+			status: '400',
 			type: 'Error',
 			source: req.path,
 			title: 'Movie with given id could not be found',
@@ -530,6 +571,7 @@ const purchaseMovie = async (req, res) => {
 	// Check if movie exists in db
 	if (!user) {
 		return res.status(400).send({
+			status: '400',
 			type: 'Error',
 			source: req.path,
 			title: 'User with given id could not be found',
@@ -553,6 +595,7 @@ const purchaseMovie = async (req, res) => {
 			});
 
 			return res.status(201).json({
+				status: '201',
 				type: 'Success',
 				source: req.path,
 				message: 'Movie successfully purchased',
@@ -560,6 +603,7 @@ const purchaseMovie = async (req, res) => {
 			});
 		} catch (err) {
 			return res.status(500).send({
+				status: '500',
 				type: 'Error',
 				source: req.path,
 				title: 'Database error',
@@ -584,6 +628,7 @@ const purchaseMovie = async (req, res) => {
 		}
 	} else {
 		return res.status(400).json({
+			status: '400',
 			type: 'Error',
 			source: req.path,
 			message: 'Insufficient stock to complete order',
@@ -599,6 +644,7 @@ const returnMovie = async (req, res) => {
 		// Check if Order exists in db
 		if (!rent) {
 			return res.status(400).send({
+				status: '400',
 				type: 'Error',
 				source: req.path,
 				title: 'Rental order with given id could not be found',
@@ -606,6 +652,7 @@ const returnMovie = async (req, res) => {
 		}
 	} catch (err) {
 		return res.status(404).send({
+			status: '404',
 			type: 'Error',
 			source: req.path,
 			message: 'Order with given id could not be found',
@@ -632,6 +679,7 @@ const returnMovie = async (req, res) => {
 		}
 
 		return res.status(201).json({
+			status: '201',
 			type: 'Success',
 			source: req.path,
 			message: 'Movie successfully returned',
