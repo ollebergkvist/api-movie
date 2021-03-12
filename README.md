@@ -32,6 +32,9 @@ PORT={PORT}
 # Database
 
 ```
+Path to db dump:
+/db/dump
+
 Backup
 mongodump --db movies --archive=movies.archive --gzip
 

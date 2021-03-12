@@ -8,7 +8,7 @@ FROM node:14-alpine AS node
 FROM node AS final
 
 # Set node environment to production
-ENV NODE_ENV=test
+ENV NODE_ENV=production
 
 # Update the system
 RUN apk --no-cache -U upgrade
