@@ -12,6 +12,8 @@ Install dependencies: npm install
 
 Create .env file: touch .env
 
+Create folders: mkdir uploads logs
+
 Start: run npm dev
 
 ```
@@ -57,6 +59,15 @@ https://www.getpostman.com/collections/7a71e416d915d809cea9
 
 Deployed (Heroku):
 https://www.getpostman.com/collections/e053a56d92616fc3bab9
+```
+
+# Docker
+
+```
+docker build -t {tagname}
+docker run -d -p {port}:{port} {tagname}
+docker-compose up --detach
+
 ```
 
 # Movie API documentation

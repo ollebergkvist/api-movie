@@ -68,6 +68,7 @@ router.put(
 	'/movies/:id',
 	auth,
 	admin,
+	uploadImage,
 	validator.params(schemas.id),
 	validator.body(schemas.put),
 	movieController.updateMovie
