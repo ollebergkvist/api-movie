@@ -1,16 +1,20 @@
-const logger = require('../models/log.js'); // Module to create logs
 const Movie = require('../schemas/movie.js'); // Movie mongoose schema
+const User = require('../schemas/user.js'); // User mongoose schema
 const Rent = require('../schemas/rent.js'); // Rent mongoose schema
 const Purchase = require('../schemas/purchase.js'); // Purchase mongoose schema
 const aqp = require('api-query-params'); // Module to convert query params to mongodb query object
 const setPaginationOptions = require('../models/pagination_options.js'); // Helper function to set options for pagination depending on queries supplied
-const getCurrentDateAndTime = require('../models/date_time.js');
-const currentDateAndTime = getCurrentDateAndTime();
+const setLoggingData = require('../models/log_options.js'); // Helper function to set logging data depending on queries supplied
+const getCurrentDateAndTime = require('../models/date_time.js'); // Helper function to get and format date and time
+const winston = require('winston');
+const path = require('path');
 
-logger.log({
-	level: 'info',
-	date: currentDateAndTime,
-	message: 'Hello distributed log files!',
+const logger = winston.createLogger({
+	format: winston.format.json(),
+	showLevel: false,
+	transports: [
+		new winston.transports.File({ filename: path.join('log', '/log.txt') }),
+	],
 });
 
 // Controller for retrieving all movies
@@ -239,7 +243,6 @@ const searchMoviesAdmin = async (req, res) => {
 // Controller for creating a movie
 const createMovie = async (req, res) => {
 	const movieExists = await Movie.findOne({ title: req.body.title });
-
 	if (movieExists) {
 		return res.status(400).send({
 			type: 'Error',
@@ -278,19 +281,55 @@ const createMovie = async (req, res) => {
 
 // Controller for updating a movie
 const updateMovie = async (req, res, next) => {
-	Movie.updateOne(
-		{ _id: req.params.id },
-		{
-			title: req.body.title,
+	const entries = Object.keys(req.body);
+	const updates = {};
+
+	// constructing dynamic query
+	for (let i = 0; i < entries.length; i++) {
+		updates[entries[i]] = Object.values(req.body)[i];
+	}
+
+	try {
+		const movie = await Movie.findById(req.params.id);
+
+		if (!movie) {
+			return res.status(400).send({
+				type: 'Error',
+				source: req.path,
+				title: 'Movie with given id could not be found',
+			});
 		}
-	)
-		.then((document) => {
-			if (!document) {
-				return res.st(404).end();
+
+		await Movie.updateOne(
+			{ _id: req.params.id },
+			{
+				$set: updates,
 			}
-			return res.status(204).json(document);
-		})
-		.catch((err) => next(err));
+		);
+
+		// Data to log
+		const data = await setLoggingData(
+			req.body.title,
+			req.body.sales_price,
+			req.body.rental_price
+		);
+
+		// Log to json file
+		logger.log(data);
+
+		return res.status(204).json({
+			type: 'Success',
+			source: req.path,
+			message: 'Movie updated successfully',
+		});
+	} catch (err) {
+		return res.status(500).send({
+			type: 'Error',
+			source: req.path,
+			title: 'Database error',
+			message: err.message,
+		});
+	}
 };
 
 // Controller for hard deleting a movie
@@ -388,9 +427,11 @@ const availability = async (req, res) => {
 // Controller for renting a movie
 const rentMovie = async (req, res) => {
 	const movie = await Movie.findById(req.body.movie_id);
+	const user = await User.findById(req.body.customer_id);
 	const movieStock = movie.stock;
 	const orderAmount = req.body.amount;
 
+	// Check if movie exists in db
 	if (!movie) {
 		return res.status(400).send({
 			type: 'Error',
@@ -399,9 +440,21 @@ const rentMovie = async (req, res) => {
 		});
 	}
 
+	// Check if movie exists in db
+	if (!user) {
+		return res.status(400).send({
+			type: 'Error',
+			source: req.path,
+			title: 'User with given id could not be found',
+		});
+	}
+
 	// Checks that there are sufficient movies in stock to continue with the rental
 	if (movieStock >= orderAmount) {
+		// Calculate stock
 		const newStock = movieStock - orderAmount;
+
+		// Create mongodb document
 		const rent = new Rent({
 			movieID: req.body.movie_id,
 			customerID: req.body.customer_id,
@@ -409,7 +462,7 @@ const rentMovie = async (req, res) => {
 			cost: req.body.cost,
 		});
 
-		// Update stock for movie and create rental order
+		// Update stock and create rental order
 		try {
 			await rent.save();
 			await movie.update({
@@ -429,6 +482,22 @@ const rentMovie = async (req, res) => {
 				title: 'Database error',
 				message: err.message,
 			});
+		} finally {
+			// Get timestamp
+			const currentDateAndTime = await getCurrentDateAndTime();
+			const amount = req.body.amount;
+			const amountAsString = amount.toString();
+
+			// Log to json file
+			logger.log({
+				level: 'info',
+				date: currentDateAndTime,
+				type: 'Order confirmation',
+				category: 'Rental',
+				customer: user.email,
+				title: movie.title,
+				copies: amountAsString,
+			});
 		}
 	} else {
 		return res.status(500).json({
@@ -439,12 +508,14 @@ const rentMovie = async (req, res) => {
 	}
 };
 
-// Controller for renting a movie
+// Controller for purchasing a movie
 const purchaseMovie = async (req, res) => {
 	const movie = await Movie.findById(req.body.movie_id);
+	const user = await User.findById(req.body.customer_id);
 	const movieStock = movie.stock;
 	const orderAmount = req.body.amount;
 
+	// Check if movie exists in db
 	if (!movie) {
 		return res.status(400).send({
 			type: 'Error',
@@ -453,6 +524,16 @@ const purchaseMovie = async (req, res) => {
 		});
 	}
 
+	// Check if movie exists in db
+	if (!user) {
+		return res.status(400).send({
+			type: 'Error',
+			source: req.path,
+			title: 'User with given id could not be found',
+		});
+	}
+
+	// Checks that there are sufficient movies in stock to continue with the rental
 	if (movieStock >= orderAmount) {
 		const newStock = movieStock - orderAmount;
 		const purchase = new Purchase({
@@ -480,6 +561,22 @@ const purchaseMovie = async (req, res) => {
 				source: req.path,
 				title: 'Database error',
 				message: err.message,
+			});
+		} finally {
+			// Get timestamp
+			const currentDateAndTime = await getCurrentDateAndTime();
+			const amount = req.body.amount;
+			const amountAsString = amount.toString();
+
+			// Log to json file
+			logger.log({
+				level: 'info',
+				date: currentDateAndTime,
+				type: 'Order confirmation',
+				category: 'Purchase',
+				customer: user.email,
+				title: movie.title,
+				copies: amountAsString,
 			});
 		}
 	} else {

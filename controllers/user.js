@@ -25,7 +25,7 @@ const updateUserRights = async (req, res) => {
 			detail: 'User rights updated successfully',
 		});
 	} catch (err) {
-		return res.status(500).send({
+		return res.status(404).send({
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -63,7 +63,7 @@ const getUser = async (req, res) => {
 			document: user,
 		});
 	} catch (err) {
-		return res.status(500).send({
+		return res.status(404).send({
 			type: 'Error',
 			source: req.path,
 			title: 'Database error',
@@ -129,6 +129,14 @@ const login = async (req, res) => {
 	try {
 		// Try to find a user with given email
 		const user = await userSchema.findOne({ email: req.body.email });
+
+		if (!user) {
+			return res.status(400).json({
+				type: 'Error',
+				source: req.path,
+				detail: 'User with given id could not be found',
+			});
+		}
 
 		// Error handling if a user with given email was not found
 		if (!user) {
