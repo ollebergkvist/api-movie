@@ -496,7 +496,8 @@ POST /api/movies
 ### Description
 
 ```
-Supports upload functionality of images, if form-data is used over body.
+Supports upload of images with multer.
+For the route to work it's necessary to use the form-data option in Postman.
 Images are stored in the uploads folder.
 ```
 
